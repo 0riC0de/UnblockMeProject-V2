@@ -58,6 +58,8 @@ namespace UnblockMeProject
                 isDragging = true;
                 clickPosition = e.GetPosition(gameBoard);
                 rectangle.CaptureMouse();
+                mainWindow.RemoveRec(2 , currentColumn, 2 , true);
+                    
             }
         }
 
@@ -108,11 +110,9 @@ namespace UnblockMeProject
                 nearestColumn = Math.Max(0, Math.Min(nearestColumn, gameBoard.ColumnDefinitions.Count));
 
                 // Update current column position
-                bool isForward = false;
-                if(currentColumn < nearestColumn) isForward = true;
                 currentColumn = nearestColumn;
                 transform.X = 0;
-                mainWindow.OnBlockMove(2, currentColumn + 1, "red" , isForward , 2);
+                mainWindow.OnBlockMove(2, currentColumn + 1, "Red" , 2 , true);
                 Grid.SetColumn(rectangle, currentColumn);
 
                 // Check if the block has reached the exit (right side beyond the last column)

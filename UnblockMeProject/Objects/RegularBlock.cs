@@ -74,6 +74,11 @@ namespace UnblockMeProject
                 isDragging = true;
                 clickPosition = e.GetPosition(gameBoard);
                 rectangle.CaptureMouse();
+                if (!isHorizontal)
+                    mainWindow.RemoveRec(currentRowOrColumn, Column, RowSpan + ColumnSpan - 1, isHorizontal);
+                else
+                    mainWindow.RemoveRec(Row, currentRowOrColumn, RowSpan + ColumnSpan - 1, isHorizontal);
+
             }
         }
 
@@ -118,10 +123,10 @@ namespace UnblockMeProject
                     // Allow movement up to the exit (bottom side beyond the last row)
                     double maxTop = cellHeight * (gameBoard.RowDefinitions.Count - 1) - RowSpan * 50;
 
-                    int newRow = currentRowOrColumn + (int)(offsetY / 100) + RowSpan;
+                    int newRow = currentRowOrColumn + (int)(offsetY / 100);
                     if (currentTop >= 0 && currentTop <= maxTop + cellHeight)
                     {
-                        if (mainWindow.boardModel.IsMoveValid(newRow, Column))
+                        if (mainWindow.boardModel.IsMoveValidRec(currentRowOrColumn, Column, RowSpan , isHorizontal))
                         {
                             transform.Y += offsetY;
                         }
@@ -149,11 +154,9 @@ namespace UnblockMeProject
                     nearestColumn = Math.Max(0, Math.Min(nearestColumn, gameBoard.ColumnDefinitions.Count));
 
                     // Update current column position
-                    bool isForward = false;
-                    if (currentRowOrColumn < nearestColumn) isForward = true;
                     currentRowOrColumn = nearestColumn;
                     transform.X = 0;
-                    mainWindow.OnBlockMove(Row, currentRowOrColumn + RowSpan, "BlueHorizontal", isForward , RowSpan);
+                    mainWindow.OnBlockMove(Row, currentRowOrColumn, "Blue" , ColumnSpan, isHorizontal);
                     Grid.SetColumn(rectangle, currentRowOrColumn);
                 }
                 else
@@ -170,11 +173,9 @@ namespace UnblockMeProject
                     nearestRow = Math.Max(0, Math.Min(nearestRow, gameBoard.RowDefinitions.Count));
 
                     // Update current row position
-                    bool isForward = false;
-                    if (currentRowOrColumn < nearestRow) isForward = true;
                     currentRowOrColumn = nearestRow;
                     transform.Y = 0;
-                    mainWindow.OnBlockMove(Column, currentRowOrColumn + ColumnSpan, "BlueNotHorizontal", isForward , ColumnSpan);
+                    mainWindow.OnBlockMove(currentRowOrColumn, Column, "Blue" , RowSpan , isHorizontal);
                     Grid.SetRow(rectangle, currentRowOrColumn);
                 }
             }

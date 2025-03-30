@@ -39,5 +39,24 @@ namespace UnblockMeProject
             string key = $"{newRow},{newCol}";
             return !occupiedPositions.ContainsKey(key);
         }
+
+        public bool IsMoveValidRec(int row, int col , int span, bool isHorizontal)
+        {
+            if (isHorizontal)
+                for (int i = col; i > col - span; i--)
+                {
+                    string key = $"{row},{i}";
+                    if(occupiedPositions.ContainsKey(key))
+                        return false;
+                }
+            else
+                for (int i = row; i < row + span; i++)
+                {
+                    string key = $"{i},{col}";
+                    if (occupiedPositions.ContainsKey(key))
+                        return false;
+                }
+            return true;
+        }
     }
 }
