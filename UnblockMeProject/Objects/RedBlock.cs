@@ -79,10 +79,15 @@ namespace UnblockMeProject
                 double maxLeft = cellWidth * (gameBoard.ColumnDefinitions.Count - 1);
 
                 // Ensure the block can move outside the grid bounds on the right side
-                int newColumn = currentColumn + (int)(offsetX / 100) + 2;
+                int newColumn = currentColumn + (int)(offsetX / 100) + 1;
+                System.Diagnostics.Debug.WriteLine(newColumn);
                 if (currentLeft >= 0 && currentLeft <= maxLeft + cellWidth)
                 {
-                    if (mainWindow.boardModel.IsMoveValid(2, newColumn))
+                    if (offsetX > 0 && mainWindow.boardModel.IsMoveValid(2, newColumn + 1))
+                    {
+                        transform.X += offsetX;
+                    }
+                    else if (offsetX < 0 && mainWindow.boardModel.IsMoveValid(2, newColumn - 2))
                     {
                         transform.X += offsetX;
                     }
@@ -112,8 +117,8 @@ namespace UnblockMeProject
                 // Update current column position
                 currentColumn = nearestColumn;
                 transform.X = 0;
-                mainWindow.OnBlockMove(2, currentColumn + 1, "Red" , 2 , true);
-                Grid.SetColumn(rectangle, currentColumn);
+                if(mainWindow.OnBlockMove(2, currentColumn + 1, "Red" , 2 , true))
+                    Grid.SetColumn(rectangle, currentColumn);
 
                 // Check if the block has reached the exit (right side beyond the last column)
                 if (currentColumn == gameBoard.ColumnDefinitions.Count)

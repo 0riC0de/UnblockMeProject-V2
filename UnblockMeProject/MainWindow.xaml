@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:UnblockMeProject"
         mc:Ignorable="d"
         Title="MainWindow" Height="334.427" Width="313.115">
-    <Canvas Name ="MyGameCanvas" Margin="0,0,58,0">
         <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="/images.jpg"/>
@@ -39,5 +38,4 @@
             </Grid>
         </Border>
       </Grid>
-    </Canvas>
 </Window>

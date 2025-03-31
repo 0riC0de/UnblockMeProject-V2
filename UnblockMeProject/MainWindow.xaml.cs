@@ -37,9 +37,8 @@ namespace UnblockMeProject
             boardModel.AddBlock(2, 0, "Red");
             boardModel.AddBlock(2, 1, "Red");
 
-
         }
-        public void OnBlockMove(int newRow, int newCol, string color , int span , bool isHorizontal)
+        public bool OnBlockMove(int newRow, int newCol, string color , int span , bool isHorizontal)
         {
            if (boardModel.IsMoveValidRec(newRow, newCol,span , isHorizontal))
             {
@@ -74,7 +73,9 @@ namespace UnblockMeProject
             {
                 // Handle invalid move
                 Console.WriteLine("RecNotValid");
+                return false;
             }
+           return true;
         }
         public void RemoveRec(int row, int col , int span , bool isHorizontal)
         {
