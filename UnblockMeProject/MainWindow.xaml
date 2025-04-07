@@ -1,0 +1,41 @@
+﻿<Window x:Class="UnblockMeProject.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnblockMeProject"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="334.427" Width="313.115">
+        <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/images.jpg"/>
+        </Grid.Background>
+        <!-- Border around the game board grid -->
+        <Border BorderBrush="Black" BorderThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <!-- Define the game board grid -->
+            <Grid Name="GameBoard">
+                <!-- Define rows and columns for the grid -->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="50"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Example of a block in the grid -->
+                <!-- Exit for the red block -->
+                <Rectangle Name="EndBlock" Grid.Row="2" Grid.Column="5" Fill="Transparent" Stroke="#FFFF0606" StrokeThickness="1"/>
+            </Grid>
+        </Border>
+      </Grid>
+</Window>
