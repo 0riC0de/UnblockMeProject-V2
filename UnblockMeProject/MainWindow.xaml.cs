@@ -29,11 +29,16 @@ namespace UnblockMeProject
             InitializeComponent();
             boardModel = new BoardModel();
             redBlock = new RedBlock(GameBoard , this);
-            //regularBlock = new RegularBlock(GameBoard, 4, 1, 1, 3, true , this);
+            regularBlock = new RegularBlock(GameBoard, 4, 1, 1, 3, true , this);
             regularBlock2 = new RegularBlock(GameBoard, 3, 2, 3, 1, false , this);
             boardModel.AddBlock(3, 2, "Blue");
             boardModel.AddBlock(4, 2, "Blue");
             boardModel.AddBlock(5, 2, "Blue");
+
+            boardModel.AddBlock(3, 2, "BlueH");
+            boardModel.AddBlock(4, 2, "BlueH");
+            boardModel.AddBlock(5, 2, "BlueH");
+
             boardModel.AddBlock(2, 0, "Red");
             boardModel.AddBlock(2, 1, "Red");
 
@@ -58,7 +63,7 @@ namespace UnblockMeProject
                 {
                     for (int i = newCol; i > newCol - span; i--)
                     {
-                        boardModel.AddBlock(newRow, i, "Blue");
+                        boardModel.AddBlock(newRow, i, "BlueH");
                     }
                 }
                 //BlueNotHorizontal

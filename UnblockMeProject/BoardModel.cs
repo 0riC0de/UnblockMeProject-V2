@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Windows.Input;
 
 namespace UnblockMeProject
 {
@@ -40,13 +41,13 @@ namespace UnblockMeProject
             return !occupiedPositions.ContainsKey(key);
         }
 
-        public bool IsMoveValidRec(int row, int col , int span, bool isHorizontal)
+        public bool IsMoveValidRec(int row, int col, int span, bool isHorizontal)
         {
             if (isHorizontal)
                 for (int i = col; i > col - span; i--)
                 {
                     string key = $"{row},{i}";
-                    if(occupiedPositions.ContainsKey(key))
+                    if (occupiedPositions.ContainsKey(key))
                         return false;
                 }
             else
@@ -64,6 +65,69 @@ namespace UnblockMeProject
             {
                 Console.WriteLine($"Position: {position.Key}, Color: {position.Value}");
             }
+        }
+        public int GetRed()
+        {
+            int max = -1;
+            foreach (var position in occupiedPositions)
+            {
+                if (position.Value == "red")
+                {
+                    string[] numbers = position.Value.Split(',');
+                    int colNumber = int.Parse(numbers[1]);
+
+                    if (colNumber > max)
+                        max = colNumber;
+                }
+            }
+            return max;
+        }
+        public int[] GetBlock(int row, int col)
+        {
+            int span = 0;
+            int xCount = 0;
+            int yCount = 0;
+            int[] x = new int[4];
+            int[] y = new int[4];
+            string name = "";
+            foreach (var position in occupiedPositions)
+            {
+                string key = row + "," + col;
+                if (position.Key == key)
+                {
+                    name = position.Value;
+                    break;
+                }
+            }
+            foreach (var position in occupiedPositions)
+            {
+                if (position.Key == name)
+                {
+                    span++;
+                    string[] numbers = position.Value.Split(',');
+                    int rowNumber = int.Parse(numbers[0]);
+                    int colNumber = int.Parse(numbers[1]);
+                    x[xCount++] = colNumber;
+                    y[yCount++] = rowNumber;
+
+                }
+            }
+            int[] Return = new int[4];
+            if (y[0] == y[1]) // not horizontal!
+            {
+                Return[3] = 1;
+                Return[1] = x.Max();
+                Return[0] = y.Max();
+                Return[2] = span;
+            }
+            else
+            {
+                Return[3] = 0;
+                Return[1] = x.Max();
+                Return[0] = y.Max();
+                Return[2] = span;
+            }
+            return Return;
         }
     }
 }

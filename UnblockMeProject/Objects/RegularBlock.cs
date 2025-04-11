@@ -158,7 +158,7 @@ namespace UnblockMeProject
                     currentRowOrColumn = nearestColumn;
                     transform.X = 0;
 
-                    if (mainWindow.OnBlockMove(Row, currentRowOrColumn, "Blue", ColumnSpan, isHorizontal))
+                    if (mainWindow.OnBlockMove(Row, currentRowOrColumn, "BlueH", ColumnSpan, isHorizontal))
                     {
                         Grid.SetColumn(rectangle, currentRowOrColumn);
                     }
@@ -167,8 +167,8 @@ namespace UnblockMeProject
                         // Reset to the previous position if the move is invalid
                         currentRowOrColumn = previousColumn;
                         Grid.SetColumn(rectangle, currentRowOrColumn);
-                        mainWindow.boardModel.AddBlock(Row, currentRowOrColumn, "Blue");
-                        mainWindow.boardModel.AddBlock(Row, currentRowOrColumn + 1, "Blue");
+                        mainWindow.boardModel.AddBlock(Row, currentRowOrColumn, "BlueH");
+                        mainWindow.boardModel.AddBlock(Row, currentRowOrColumn + 1, "BlueH");
                     }
                 }
                 else
