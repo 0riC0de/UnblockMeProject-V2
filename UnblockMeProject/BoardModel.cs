@@ -10,7 +10,7 @@ namespace UnblockMeProject
 {
     public class BoardModel
     {
-        private Dictionary<string, string> occupiedPositions;
+        public Dictionary<string, string> occupiedPositions;
 
         public BoardModel()
         {
@@ -71,9 +71,9 @@ namespace UnblockMeProject
             int max = -1;
             foreach (var position in occupiedPositions)
             {
-                if (position.Value == "red")
+                if (position.Value == "Red")
                 {
-                    string[] numbers = position.Value.Split(',');
+                    string[] numbers = position.Key.Split(',');
                     int colNumber = int.Parse(numbers[1]);
 
                     if (colNumber > max)
@@ -101,10 +101,10 @@ namespace UnblockMeProject
             }
             foreach (var position in occupiedPositions)
             {
-                if (position.Key == name)
+                if (position.Value == name)
                 {
                     span++;
-                    string[] numbers = position.Value.Split(',');
+                    string[] numbers = position.Key.Split(',');
                     int rowNumber = int.Parse(numbers[0]);
                     int colNumber = int.Parse(numbers[1]);
                     x[xCount++] = colNumber;
@@ -129,5 +129,41 @@ namespace UnblockMeProject
             }
             return Return;
         }
+        // method that will return a list of all of the rectangles on the board using the getblock format
+        public List<int[]> GetAllBlocks()
+        {
+            List<int[]> blocks = new List<int[]>();
+            HashSet<string> visited = new HashSet<string>();
+
+            foreach (var position in occupiedPositions)
+            {
+                if (!visited.Contains(position.Key))
+                {
+                    string[] coordinates = position.Key.Split(',');
+                    int row = int.Parse(coordinates[0]);
+                    int col = int.Parse(coordinates[1]);
+
+                    int[] block = GetBlock(row, col);
+                    blocks.Add(block);
+
+                    // Mark all parts of the block as visited
+                    for (int i = 0; i < block[2]; i++)
+                    {
+                        if (block[3] == 1) // Horizontal
+                        {
+                            visited.Add($"{row},{col + i}");
+                        }
+                        else // Vertical
+                        {
+                            visited.Add($"{row + i},{col}");
+                        }
+                    }
+                }
+            }
+
+            return blocks;
+        }
+
+
     }
 }

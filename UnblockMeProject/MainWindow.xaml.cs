@@ -23,25 +23,30 @@ namespace UnblockMeProject
         private RegularBlock regularBlock;
         private RegularBlock regularBlock2;
         public BoardModel boardModel;
+        public GameState gameState;
 
         public MainWindow()
         {
             InitializeComponent();
             boardModel = new BoardModel();
             redBlock = new RedBlock(GameBoard , this);
-            regularBlock = new RegularBlock(GameBoard, 4, 1, 1, 3, true , this);
-            regularBlock2 = new RegularBlock(GameBoard, 3, 2, 3, 1, false , this);
+            regularBlock = new RegularBlock(GameBoard, 5, 1, 1, 3, true , this);
+            regularBlock2 = new RegularBlock(GameBoard, 2, 2, 3, 1, false , this);
+            boardModel.AddBlock(2, 2, "Blue");
             boardModel.AddBlock(3, 2, "Blue");
             boardModel.AddBlock(4, 2, "Blue");
-            boardModel.AddBlock(5, 2, "Blue");
 
-            boardModel.AddBlock(3, 2, "BlueH");
-            boardModel.AddBlock(4, 2, "BlueH");
+            boardModel.AddBlock(5, 1, "BlueH");
             boardModel.AddBlock(5, 2, "BlueH");
+            boardModel.AddBlock(5, 3, "BlueH");
 
             boardModel.AddBlock(2, 0, "Red");
             boardModel.AddBlock(2, 1, "Red");
 
+            gameState = new GameState();
+            gameState.initializeState(boardModel);
+            gameState.CalculateCost();
+            gameState.GetSuccessorStates();
         }
         public bool OnBlockMove(int newRow, int newCol, string color , int span , bool isHorizontal)
         {
