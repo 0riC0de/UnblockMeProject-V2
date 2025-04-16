@@ -19,7 +19,7 @@ namespace UnblockMeProject
 
         private BoardModel State;
         private GameState Previous {  get; set; }
-        private double Cost { get; set; }
+        public int Cost { get; set; }
 
 
 
