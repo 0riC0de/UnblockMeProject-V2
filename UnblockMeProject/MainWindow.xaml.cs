@@ -24,12 +24,12 @@ namespace UnblockMeProject
         private RegularBlock regularBlock2;
         public BoardModel boardModel;
         public GameState gameState;
-
         public MainWindow()
         {
             InitializeComponent();
             boardModel = new BoardModel();
             redBlock = new RedBlock(GameBoard , this);
+            AStarSearcher solver = new AStarSearcher();
             regularBlock = new RegularBlock(GameBoard, 5, 1, 1, 3, true , this);
             regularBlock2 = new RegularBlock(GameBoard, 2, 2, 3, 1, false , this);
             boardModel.AddBlock(2, 2, "Blue");
@@ -46,7 +46,9 @@ namespace UnblockMeProject
             gameState = new GameState();
             gameState.initializeState(boardModel);
             gameState.CalculateCost();
-            gameState.GetSuccessorStates();
+            solver.Solver(gameState);
+            
+
         }
         public bool OnBlockMove(int newRow, int newCol, string color , int span , bool isHorizontal)
         {

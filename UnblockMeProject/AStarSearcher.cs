@@ -13,25 +13,33 @@ namespace UnblockMeProject
 {
     internal class AStarSearcher
     {
-        public HashSet<GameState> Solver(GameState gameState)
+        public GameState Solver(GameState gameState)
         {
             SimplePriorityQueue<GameState> openSet = new SimplePriorityQueue<GameState>();
             Dictionary<GameState, int> gScore = new Dictionary<GameState, int>();
+            gScore[gameState] = 0;// the g of the AStar! the h of the aStar is cost
             var cameFrom = new Dictionary<GameState, GameState>();
-            gScore[gameState] = 0; // the g of the AStar! the h of the aStar is cost
-            bool isBreak = false;
             openSet.Enqueue(gameState , (int)gameState.Cost);
             HashSet<GameState> closedSet = new HashSet<GameState>();
 
-            GameState current = openSet.Dequeue();
-            gScore[current] = gScore[gameState] + 1;
-            closedSet.Add((GameState)current);
+            GameState current = new GameState();
 
-            while (!isBreak)
+            while (openSet.Count() > 0)
             {
+                    current = openSet.Dequeue();
+
+                    if (current.Cost == 0) // Or IsGoal(successor)
+                    {
+                        // GOAL FOUND!
+                        // Now you would call a function that runs on the previous untill null!
+                        Console.WriteLine("Goal Found! Path reconstruction needed.");
+                        return current; 
+                    }
+                    closedSet.Add((GameState)current);
+
                 foreach (var neighbor in current.GetSuccessorStates())
                 {
-                    if (!closedSet.Contains(neighbor))
+                    if (closedSet.Contains(neighbor))
                     {
                         continue;
                     }
@@ -43,28 +51,11 @@ namespace UnblockMeProject
                         gScore[neighbor] = tentativeGScore; // Update the best g-score for 'neighbor'
                         float neighborFScore = tentativeGScore + (int)neighbor.Cost;
                         openSet.Enqueue(neighbor, neighborFScore);
-                        gScore[neighbor] = gScore[current] + 1;
-                    }
-                    else
-                    {
-                        openSet.Enqueue(neighbor, (int)neighbor.Cost + gScore[current] + 1);
-                        gScore[neighbor] = gScore[current] + 1;
                     }
 
                 }
-                current = openSet.Dequeue();
-                if (current.Cost == 0) // Or IsGoal(successor)
-                {
-                    // GOAL FOUND!
-                    // Now you would call a function to reconstruct the path using 'cameFrom'.
-                    Console.WriteLine("Goal Found! Path reconstruction needed.");
-                    // return ReconstructPath(cameFrom, current); // <<-- Add this function later   
-                    isBreak = true; // Temporary until path reconstruction is added
-                }
-                closedSet.Add((GameState)current);
             }
-            return closedSet;
+            return null;
         }
-        
     }
 }
