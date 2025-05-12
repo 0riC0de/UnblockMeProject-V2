@@ -18,7 +18,7 @@ namespace UnblockMeProject
         private const int IsHorizontal = 3;
 
         private BoardModel State;
-        private GameState Previous {  get; set; }
+        private GameState Previous { get; set; }
         public int Cost { get; set; }
 
 
@@ -32,16 +32,17 @@ namespace UnblockMeProject
             {
                 if (!State.IsMoveValid(2, i))      // put 2 because thats the row of red
                 {
+                    checkd = false;
                     this.Cost++;
                     // gives the block if given one position. output if horizontal arr[Max(x) , y , span , 1 -horizontal]
                     // output if NotHorizontal arr[x , Max(y) , span , 0 - Nothorizontal]
-                    int[] Block = State.GetBlock(2, i);
+                    (int[] Block, string blockName) = State.GetBlock(2, i);
                     if (Block[3] == 0) // not horizontal because red cant be blocked by a horizontal rec!
                     {
                         if (Block[2] == 3) // check if the block can even clear going down!
                         {
                             if (!State.IsMoveValid(Block[X] + 1, Block[Y]))
-                            { 
+                            {
                                 this.Cost++;
                                 checkd = true;
                             }
@@ -56,7 +57,7 @@ namespace UnblockMeProject
                             }
                             else
                                 if (checkd)
-                                    { Cost--; }
+                            { Cost--; }
                         }
                     }
                 }
@@ -76,11 +77,11 @@ namespace UnblockMeProject
         public List<GameState> GetSuccessorStates()
         {
             GameState gameState = this;
-            // gets a list of arrays with all of the blocks like the GetBlock format
-            List<int[]> recs = gameState.State.GetAllBlocks();
+            // gets a list of tuples with (blockData, blockName)
+            List<(int[], string)> recs = gameState.State.GetAllBlocks();
 
             List<GameState> Seccessors = new List<GameState>();
-            foreach (int[] rec in recs)
+            foreach ((int[] rec, string blockName) in recs)
             {
                 if (rec[IsHorizontal] == 0) // NotHorizontal
                 {
@@ -92,10 +93,10 @@ namespace UnblockMeProject
                         {
                             newState.State.occupiedPositions.Add(position.Key, position.Value);
                         }
-                        newState.State.AddBlock(rec[X] + 1, rec[Y], "Blue"); // will need to change it and make the name id's!!
+                        newState.State.AddBlock(rec[X] + 1, rec[Y], blockName); // Use the real name!
                         newState.State.RemoveBlock(rec[X] - rec[Span] + 1, rec[Y]);
-                        newState.CalculateCost(); // calc the cost
-                        newState.Previous = gameState; // set previous
+                        newState.CalculateCost();
+                        newState.Previous = gameState;
                         Seccessors.Add(newState);
                     }
                     if (gameState.State.IsMoveValid(rec[X] - rec[Span], rec[Y]) && rec[X] - rec[Span] >= 0) // Can go up?
@@ -106,21 +107,15 @@ namespace UnblockMeProject
                         {
                             newState.State.occupiedPositions.Add(position.Key, position.Value);
                         }
-                        newState.State.AddBlock(rec[X] - rec[Span], rec[Y], "Blue"); // will need to change it and make the name id's!!
+                        newState.State.AddBlock(rec[X] - rec[Span], rec[Y], blockName); // Use the real name!
                         newState.State.RemoveBlock(rec[X], rec[Y]);
-                        newState.CalculateCost(); // calc the cost
-                        newState.Previous = gameState; // set previous
+                        newState.CalculateCost();
+                        newState.Previous = gameState;
                         Seccessors.Add(newState);
                     }
                 }
                 else
                 {
-                    string name = "";
-                    if (rec[X] == 2)
-                        name = "Red";
-                    else
-                        name = "BlueH";
-
                     if (gameState.State.IsMoveValid(rec[X], rec[Y] + 1) && rec[Y] + 1 <= 5) // can go right?
                     {
                         GameState newState = new GameState();
@@ -129,10 +124,10 @@ namespace UnblockMeProject
                         {
                             newState.State.occupiedPositions.Add(position.Key, position.Value);
                         }
-                        newState.State.AddBlock(rec[X], rec[Y] + 1, name); // will need to change it and make the name id's!!
+                        newState.State.AddBlock(rec[X], rec[Y] + 1, blockName); // Use the real name!
                         newState.State.RemoveBlock(rec[X], rec[Y] - rec[Span] + 1);
-                        newState.CalculateCost(); // calc the cost
-                        newState.Previous = gameState; // set previous
+                        newState.CalculateCost();
+                        newState.Previous = gameState;
                         Seccessors.Add(newState);
                     }
                     if (gameState.State.IsMoveValid(rec[X], rec[Y] - rec[Span]) && rec[Y] - rec[Span] >= 0) // can go left?
@@ -143,17 +138,15 @@ namespace UnblockMeProject
                         {
                             newState.State.occupiedPositions.Add(position.Key, position.Value);
                         }
-                        newState.State.AddBlock(rec[X], rec[Y] - rec[Span], name); // will need to change it and make the name id's!!
+                        newState.State.AddBlock(rec[X], rec[Y] - rec[Span], blockName); // Use the real name!
                         newState.State.RemoveBlock(rec[X], rec[Y]);
-                        newState.CalculateCost(); // calc the cost
-                        newState.Previous = gameState; // set previous
+                        newState.CalculateCost();
+                        newState.Previous = gameState;
                         Seccessors.Add(newState);
                     }
                 }
             }
             return Seccessors;
         }
-
     }
-
 }

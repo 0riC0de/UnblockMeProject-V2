@@ -71,7 +71,7 @@ namespace UnblockMeProject
             int max = -1;
             foreach (var position in occupiedPositions)
             {
-                if (position.Value == "Red")
+                if (position.Value.Contains("Red"))
                 {
                     string[] numbers = position.Key.Split(',');
                     int colNumber = int.Parse(numbers[1]);
@@ -82,7 +82,7 @@ namespace UnblockMeProject
             }
             return max;
         }
-        public int[] GetBlock(int row, int col)
+        public (int[],string) GetBlock(int row, int col)
         {
             int span = 0;
             int xCount = 0;
@@ -127,12 +127,12 @@ namespace UnblockMeProject
                 Return[0] = y.Max();
                 Return[2] = span;
             }
-            return Return;
+            return (Return , name);
         }
         // method that will return a list of all of the rectangles on the board using the getblock format
-        public List<int[]> GetAllBlocks()
+        public List<(int[] , string)> GetAllBlocks()
         {
-            List<int[]> blocks = new List<int[]>();
+            List<(int[] , string)> blocks = new List<(int[] , string)>();
             HashSet<string> visited = new HashSet<string>();
 
             foreach (var position in occupiedPositions)
@@ -143,13 +143,13 @@ namespace UnblockMeProject
                     int row = int.Parse(coordinates[0]);
                     int col = int.Parse(coordinates[1]);
 
-                    int[] block = GetBlock(row, col);
-                    blocks.Add(block);
+                    (int[] blockData , string blockName) = GetBlock(row, col);
+                    blocks.Add((blockData , blockName));
 
                     // Mark all parts of the block as visited
-                    for (int i = 0; i < block[2]; i++)
+                    for (int i = 0; i < blockData[2]; i++)
                     {
-                        if (block[3] == 1) // Horizontal
+                        if (blockData[3] == 1) // Horizontal
                         {
                             visited.Add($"{row},{col + i}");
                         }
@@ -160,9 +160,8 @@ namespace UnblockMeProject
                     }
                 }
             }
-
             return blocks;
-        }
+        } 
 
 
     }

@@ -18,6 +18,7 @@ namespace UnblockMeProject
         private int currentRowOrColumn;
         private bool isHorizontal;
         private MainWindow mainWindow;
+        private string name;
 
         public int Row { get; set; }
         public int Column { get; set; }
@@ -25,7 +26,7 @@ namespace UnblockMeProject
         public int ColumnSpan { get; set; }
         public Brush Fill { get; set; }
 
-        public RegularBlock(Grid gameBoard, int row, int column, int rowSpan, int columnSpan, bool isHorizontal , MainWindow mainWindow)
+        public RegularBlock(Grid gameBoard, int row, int column, int rowSpan, int columnSpan, bool isHorizontal , MainWindow mainWindow , string name)
         {
             this.gameBoard = gameBoard;
             this.mainWindow = mainWindow;
@@ -36,6 +37,7 @@ namespace UnblockMeProject
             this.Fill = Brushes.Blue;
             this.isHorizontal = isHorizontal;
             this.currentRowOrColumn = isHorizontal ? column : row;
+            this.name = name;
 
             InitializeBlock();
         }
@@ -158,7 +160,7 @@ namespace UnblockMeProject
                     currentRowOrColumn = nearestColumn;
                     transform.X = 0;
 
-                    if (mainWindow.OnBlockMove(Row, currentRowOrColumn, "BlueH", ColumnSpan, isHorizontal))
+                    if (mainWindow.OnBlockMove(Row, currentRowOrColumn, name, ColumnSpan, isHorizontal))
                     {
                         Grid.SetColumn(rectangle, currentRowOrColumn);
                     }
@@ -167,8 +169,8 @@ namespace UnblockMeProject
                         // Reset to the previous position if the move is invalid
                         currentRowOrColumn = previousColumn;
                         Grid.SetColumn(rectangle, currentRowOrColumn);
-                        mainWindow.boardModel.AddBlock(Row, currentRowOrColumn, "BlueH");
-                        mainWindow.boardModel.AddBlock(Row, currentRowOrColumn + 1, "BlueH");
+                        mainWindow.boardModel.AddBlock(Row, currentRowOrColumn, name);
+                        mainWindow.boardModel.AddBlock(Row, currentRowOrColumn + 1, name);
                     }
                 }
                 else
@@ -186,7 +188,7 @@ namespace UnblockMeProject
                     currentRowOrColumn = nearestRow;
                     transform.Y = 0;
 
-                    if (mainWindow.OnBlockMove(currentRowOrColumn, Column, "Blue", RowSpan, isHorizontal))
+                    if (mainWindow.OnBlockMove(currentRowOrColumn, Column, name, RowSpan, isHorizontal))
                     {
                         Grid.SetRow(rectangle, currentRowOrColumn);
                     }
@@ -195,8 +197,8 @@ namespace UnblockMeProject
                         // Reset to the previous position if the move is invalid
                         currentRowOrColumn = previousRow;
                         Grid.SetRow(rectangle, currentRowOrColumn);
-                        mainWindow.boardModel.AddBlock(currentRowOrColumn, Column, "Blue");
-                        mainWindow.boardModel.AddBlock(currentRowOrColumn + 1, Column, "Blue");
+                        mainWindow.boardModel.AddBlock(currentRowOrColumn, Column, name);
+                        mainWindow.boardModel.AddBlock(currentRowOrColumn + 1, Column, name);
                     }
                 }
             }

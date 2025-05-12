@@ -22,6 +22,7 @@ namespace UnblockMeProject
         private RedBlock redBlock;
         private RegularBlock regularBlock;
         private RegularBlock regularBlock2;
+        private RegularBlock regularBlock3;
         public BoardModel boardModel;
         public GameState gameState;
         public MainWindow()
@@ -30,15 +31,25 @@ namespace UnblockMeProject
             boardModel = new BoardModel();
             redBlock = new RedBlock(GameBoard , this);
             AStarSearcher solver = new AStarSearcher();
-            regularBlock = new RegularBlock(GameBoard, 5, 1, 1, 3, true , this);
-            regularBlock2 = new RegularBlock(GameBoard, 2, 2, 3, 1, false , this);
-            boardModel.AddBlock(2, 2, "Blue");
-            boardModel.AddBlock(3, 2, "Blue");
-            boardModel.AddBlock(4, 2, "Blue");
+            regularBlock = new RegularBlock(GameBoard, 5, 1, 1, 3, true , this ,"BlueH_1");
+            regularBlock2 = new RegularBlock(GameBoard, 2, 2, 3, 1, false , this , "Blue_0");
+            regularBlock3 = new RegularBlock(GameBoard, 3, 3, 2, 1, false, this, "Blue_2");
+            boardModel.AddBlock(2, 2, "Blue_0");
+            boardModel.AddBlock(3, 2, "Blue_0");
+            boardModel.AddBlock(4, 2, "Blue_0");
 
-            boardModel.AddBlock(5, 1, "BlueH");
-            boardModel.AddBlock(5, 2, "BlueH");
-            boardModel.AddBlock(5, 3, "BlueH");
+            boardModel.AddBlock(2, 3, "Blue_2");
+            boardModel.AddBlock(3, 3, "Blue_2");
+
+            boardModel.AddBlock(4, 3, "BlueH_3");
+            boardModel.AddBlock(4, 4, "BlueH_3");
+
+            boardModel.AddBlock(1, 3, "BlueH_4");
+            boardModel.AddBlock(1, 4, "BlueH_4");
+
+            boardModel.AddBlock(5, 1, "BlueH_1");
+            boardModel.AddBlock(5, 2, "BlueH_1");
+            boardModel.AddBlock(5, 3, "BlueH_1");    // Blue -> color , H -> Horizontal , _1 -> id
 
             boardModel.AddBlock(2, 0, "Red");
             boardModel.AddBlock(2, 1, "Red");
@@ -58,27 +69,31 @@ namespace UnblockMeProject
                 Console.WriteLine(newCol +", " + newRow);
                 // Remove the old position if necessary
                 //red
-                if (color == "Red")
+                if (color.Contains("Red"))
                 {
+                    RemoveRec(newRow, newCol, span, isHorizontal);
                     for (int i = newCol; i > newCol - span; i--)
                     {
                         boardModel.AddBlock(newRow, i, "Red");
                     }
                 }
                 //BlueHorizontal
-                else if (color == "Blue" && isHorizontal)
+                else if (color.Contains("Blue") && isHorizontal)
                 {
+                    RemoveRec(newRow, newCol, span, isHorizontal);
+
                     for (int i = newCol; i > newCol - span; i--)
                     {
-                        boardModel.AddBlock(newRow, i, "BlueH");
+                        boardModel.AddBlock(newRow, i, color);
                     }
                 }
                 //BlueNotHorizontal
-                else if (color == "Blue")
+                else if (color.Contains("Blue"))
                 {
+                    RemoveRec(newRow, newCol, span, isHorizontal);
                     for (int i = newRow; i < newRow + span; i++)
                     {
-                        boardModel.AddBlock(i, newCol, "Blue");
+                        boardModel.AddBlock(i, newCol, color);
                     }
                 }
             }
