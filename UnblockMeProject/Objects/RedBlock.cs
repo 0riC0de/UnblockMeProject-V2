@@ -21,11 +21,11 @@ namespace UnblockMeProject
         private MainWindow mainWindow;
 
 
-        public RedBlock(Grid gameBoard , MainWindow mainWindow)
+        public RedBlock(Grid gameBoard , MainWindow mainWindow , int collunm)
         {
             this.gameBoard = gameBoard;
             this.mainWindow = mainWindow;
-            this.currentColumn = 0; // Start at column 2
+            this.currentColumn = collunm; // Start at column 2
 
             rectangle = new Rectangle
             {

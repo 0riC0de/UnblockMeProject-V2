@@ -23,16 +23,19 @@ namespace UnblockMeProject
         private RegularBlock regularBlock;
         private RegularBlock regularBlock2;
         private RegularBlock regularBlock3;
+        private List<GameState> _GameStates;
+        private DispatcherTimer _timer;
+        private int _currentIndex = 0;
         public BoardModel boardModel;
         public GameState gameState;
         public MainWindow()
         {
             InitializeComponent();
             boardModel = new BoardModel();
-            redBlock = new RedBlock(GameBoard , this);
+            redBlock = new RedBlock(GameBoard, this, 0);
             AStarSearcher solver = new AStarSearcher();
-            regularBlock = new RegularBlock(GameBoard, 5, 1, 1, 3, true , this ,"BlueH_1");
-            regularBlock2 = new RegularBlock(GameBoard, 2, 2, 3, 1, false , this , "Blue_0");
+            regularBlock = new RegularBlock(GameBoard, 5, 1, 1, 3, true, this, "BlueH_1");
+            regularBlock2 = new RegularBlock(GameBoard, 2, 2, 3, 1, false, this, "Blue_0");
             regularBlock3 = new RegularBlock(GameBoard, 3, 3, 2, 1, false, this, "Blue_2");
             boardModel.AddBlock(2, 2, "Blue_0");
             boardModel.AddBlock(3, 2, "Blue_0");
@@ -57,16 +60,18 @@ namespace UnblockMeProject
             gameState = new GameState();
             gameState.initializeState(boardModel);
             gameState.CalculateCost();
-            solver.Solver(gameState);
-            
+            gameState = solver.Solver(gameState);
+            List<GameState> states = gameState.ShowPath();
+
+            StartVisualization(states);
 
         }
-        public bool OnBlockMove(int newRow, int newCol, string color , int span , bool isHorizontal)
+        public bool OnBlockMove(int newRow, int newCol, string color, int span, bool isHorizontal)
         {
             boardModel.PrintOccupiedPos();
-           if (boardModel.IsMoveValidRec(newRow, newCol,span , isHorizontal))
+            if (boardModel.IsMoveValidRec(newRow, newCol, span, isHorizontal))
             {
-                Console.WriteLine(newCol +", " + newRow);
+                Console.WriteLine(newCol + ", " + newRow);
                 // Remove the old position if necessary
                 //red
                 if (color.Contains("Red"))
@@ -103,16 +108,44 @@ namespace UnblockMeProject
                 Console.WriteLine("RecNotValid");
                 return false;
             }
-           return true;
+            return true;
         }
-        public void RemoveRec(int row, int col , int span , bool isHorizontal)
+        public void RemoveRec(int row, int col, int span, bool isHorizontal)
         {
             if (!isHorizontal)
-                for (int i = row; i < row + span; i++) 
+                for (int i = row; i < row + span; i++)
                     boardModel.RemoveBlock(i, col);
             else
                 for (int i = col; i < col + span; i++)
                     boardModel.RemoveBlock(row, i);
         }
+        public void StartVisualization(List<GameState> gameStates)
+        {
+            _currentIndex = gameStates.Count - 1;
+            _GameStates = gameStates;
+
+            _timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1) // Change the interval if you want it faster or slower
+            };
+
+            _timer.Tick += UpdateBoard;
+            _timer.Start();
+        }
+        private void UpdateBoard(object sender, EventArgs e)
+        {
+            if (_currentIndex < 0)
+            {
+                _timer.Stop(); // Stop the timer if we are at the end
+                return;
+            }
+
+            // Clear the grid and draw the next state
+            GameBoard.Children.Clear();
+            _GameStates[_currentIndex].State.DrawBoard(GameBoard, this);
+
+            _currentIndex--;
+        }
+
     }
 }

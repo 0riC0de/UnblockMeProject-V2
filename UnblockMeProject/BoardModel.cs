@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Windows.Input;
+using System.Windows.Controls;
+using System.Windows.Shapes;
 
 namespace UnblockMeProject
 {
@@ -161,8 +163,31 @@ namespace UnblockMeProject
                 }
             }
             return blocks;
-        } 
+        }
 
+        public void DrawBoard(Grid GameBoard , MainWindow window)
+        {
+            RedBlock redBlock;
+            RegularBlock regularBlock;
+            GameBoard.Children.Clear();
+            List<(int[] , string)> blocks = new List<(int[], string)> ();
+            blocks = this.GetAllBlocks();
+            foreach (var block in blocks)
+            {
+                if(block.Item2.Contains("Red"))
+                {
+                    redBlock = new RedBlock(GameBoard,window, block.Item1[1] - block.Item1[2] + 1);
+                }
+                else
+                {
+                    if (block.Item1[3] == 0)
+                        regularBlock = new RegularBlock(GameBoard, block.Item1[0] - block.Item1[2] + 1, block.Item1[1], block.Item1[2], 1, false, window, block.Item2);
+                   else
+                       regularBlock = new RegularBlock(GameBoard, block.Item1[0], block.Item1[1] - block.Item1[2] + 1,1, block.Item1[2], true, window, block.Item2);
 
+                }
+            }
+
+        }
     }
 }

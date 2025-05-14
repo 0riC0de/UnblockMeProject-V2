@@ -17,7 +17,7 @@ namespace UnblockMeProject
         private const int Span = 2;
         private const int IsHorizontal = 3;
 
-        private BoardModel State;
+        public BoardModel State;
         private GameState Previous { get; set; }
         public int Cost { get; set; }
 
@@ -147,6 +147,18 @@ namespace UnblockMeProject
                 }
             }
             return Seccessors;
+        }
+        public List<GameState> ShowPath()
+        {
+            GameState gameState = this;
+            List<GameState> states = new List<GameState>();
+            while (gameState.Previous != null)
+            {
+                states.Add(gameState);
+                gameState = gameState.Previous;
+            }
+            states.Add(gameState);
+            return states;
         }
     }
 }
