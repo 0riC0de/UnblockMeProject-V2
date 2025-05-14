@@ -34,9 +34,10 @@ namespace UnblockMeProject
             boardModel = new BoardModel();
             redBlock = new RedBlock(GameBoard, this, 0);
             AStarSearcher solver = new AStarSearcher();
-            regularBlock = new RegularBlock(GameBoard, 5, 1, 1, 3, true, this, "BlueH_1");
-            regularBlock2 = new RegularBlock(GameBoard, 2, 2, 3, 1, false, this, "Blue_0");
-            regularBlock3 = new RegularBlock(GameBoard, 3, 3, 2, 1, false, this, "Blue_2");
+            //regularBlock = new RegularBlock(GameBoard, 5, 1, 1, 3, true, this, "BlueH_1");
+            //regularBlock2 = new RegularBlock(GameBoard, 2, 2, 3, 1, false, this, "Blue_0");
+            //regularBlock3 = new RegularBlock(GameBoard, 3, 3, 2, 1, false, this, "Blue_2");
+            /*
             boardModel.AddBlock(2, 2, "Blue_0");
             boardModel.AddBlock(3, 2, "Blue_0");
             boardModel.AddBlock(4, 2, "Blue_0");
@@ -54,8 +55,54 @@ namespace UnblockMeProject
             boardModel.AddBlock(5, 2, "BlueH_1");
             boardModel.AddBlock(5, 3, "BlueH_1");    // Blue -> color , H -> Horizontal , _1 -> id
 
+            boardModel.AddBlock(1, 1, "BlueH_5");
+            boardModel.AddBlock(1, 2, "BlueH_5");
+
+            boardModel.AddBlock(4, 0, "Blue_6");
+            boardModel.AddBlock(5, 0, "Blue_6");
+
             boardModel.AddBlock(2, 0, "Red");
             boardModel.AddBlock(2, 1, "Red");
+            */
+           
+            boardModel.AddBlock(2, 1, "Red");
+            boardModel.AddBlock(2, 2, "Red");
+            
+            boardModel.AddBlock(0, 1, "BlueH_0");
+            boardModel.AddBlock(0, 2, "BlueH_0");
+
+            boardModel.AddBlock(1, 0, "BlueH_1");
+            boardModel.AddBlock(1, 1, "BlueH_1");
+
+            boardModel.AddBlock(3, 1, "BlueH_2");
+            boardModel.AddBlock(3, 2, "BlueH_2");
+
+            boardModel.AddBlock(5, 3, "BlueH_3");
+            boardModel.AddBlock(5, 4, "BlueH_3");
+            boardModel.AddBlock(5, 5, "BlueH_3");
+            
+            boardModel.AddBlock(2, 3, "Blue_4");
+            boardModel.AddBlock(3, 3, "Blue_4");
+            boardModel.AddBlock(4, 3, "Blue_4");
+
+            boardModel.AddBlock(2, 4, "Blue_5");
+            boardModel.AddBlock(3, 4, "Blue_5");
+            boardModel.AddBlock(4, 4, "Blue_5");
+
+            boardModel.AddBlock(2, 5, "Blue_6");
+            boardModel.AddBlock(3, 5, "Blue_6");
+            boardModel.AddBlock(4, 5, "Blue_6");
+
+            boardModel.AddBlock(0, 3, "Blue_7");
+            boardModel.AddBlock(1, 3, "Blue_7");
+
+            boardModel.AddBlock(3, 0, "Blue_8");
+            boardModel.AddBlock(4, 0, "Blue_8");
+
+            boardModel.AddBlock(5, 2, "Blue_9");
+            boardModel.AddBlock(4, 2, "Blue_9");
+            
+
 
             gameState = new GameState();
             gameState.initializeState(boardModel);
@@ -63,7 +110,8 @@ namespace UnblockMeProject
             gameState = solver.Solver(gameState);
             List<GameState> states = gameState.ShowPath();
 
-            StartVisualization(states);
+
+           StartVisualization(states);
 
         }
         public bool OnBlockMove(int newRow, int newCol, string color, int span, bool isHorizontal)

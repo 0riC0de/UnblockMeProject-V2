@@ -26,44 +26,82 @@ namespace UnblockMeProject
         public void CalculateCost()
         {
             this.Cost = 0;
-            bool checkd = false; //this bool checks if i can just make a move that makes the cost less 
-            int start = State.GetRed(); // gives the last colunm of red rec
+            bool checkd = false;
+            int start = State.GetRed();
+
+            // ➡️ Add Manhattan Distance (distance from red to the goal)
+            int distanceToExit = 5 - start;  // The number of spaces left
+            this.Cost += distanceToExit;
+
             for (int i = start + 1; i <= 5; i++)
             {
-                if (!State.IsMoveValid(2, i))      // put 2 because thats the row of red
+                if (!State.IsMoveValid(2, i))
                 {
                     checkd = false;
                     this.Cost++;
-                    // gives the block if given one position. output if horizontal arr[Max(x) , y , span , 1 -horizontal]
-                    // output if NotHorizontal arr[x , Max(y) , span , 0 - Nothorizontal]
+
                     (int[] Block, string blockName) = State.GetBlock(2, i);
-                    if (Block[3] == 0) // not horizontal because red cant be blocked by a horizontal rec!
+
+                    if (Block[3] == 0) // Vertical Block
                     {
-                        if (Block[2] == 3) // check if the block can even clear going down!
+                        if (Block[2] == 3)
                         {
                             if (!State.IsMoveValid(Block[X] + 1, Block[Y]))
                             {
                                 this.Cost++;
                                 checkd = true;
+
+                                //  **Extra Layer of Depth**
+                                if (!State.IsMoveValid(Block[X] + 2, Block[Y]))
+                                {
+                                    this.Cost++;
+                                    (int[] NextBlock, string nextBlockName) = State.GetBlock(Block[X] + 1, Block[Y]);
+
+                                    // If the next block is also blocked
+                                    if (!State.IsMoveValid(NextBlock[X] + 1, NextBlock[Y]))
+                                    {
+                                        this.Cost += 3; // ⬆️ Increase penalty to make it stronger
+                                    }
+                                }
                             }
                             if (!State.IsMoveValid(5, Block[Y]) && Block[X] + 1 != 5)
+                            {
                                 this.Cost++;
+                            }
                         }
-                        if (Block[2] < 3) //check if the block can even clear going up!
+
+                        if (Block[2] < 3)
                         {
                             if (!State.IsMoveValid(Block[X] - Block[Span], Block[Y]))
                             {
                                 this.Cost++;
+
+                                //  **Extra Layer of Depth**
+                                if (!State.IsMoveValid(Block[X] - Block[Span] - 1, Block[Y]))
+                                {
+                                    this.Cost++;
+                                    (int[] NextBlock, string nextBlockName) = State.GetBlock(Block[X] - Block[Span], Block[Y]);
+
+                                    // If the next block is also blocked
+                                    if (!State.IsMoveValid(NextBlock[X] - NextBlock[Span], NextBlock[Y]))
+                                    {
+                                        this.Cost += 3; // ⬆️ Increase penalty to make it stronger
+                                    }
+                                }
                             }
-                            else
-                                if (checkd)
-                            { Cost--; }
+                            else if (checkd)
+                            {
+                                Cost--;
+                            }
                         }
                     }
                 }
-
             }
         }
+
+
+
+
         public void initializeState(BoardModel state)
         {
             this.State = state;

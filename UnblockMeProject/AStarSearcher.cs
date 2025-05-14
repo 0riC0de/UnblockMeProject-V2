@@ -33,6 +33,7 @@ namespace UnblockMeProject
                         // GOAL FOUND!
                         // Now you would call a function that runs on the previous untill null!
                         Console.WriteLine("Goal Found! Path reconstruction needed.");
+                        Console.WriteLine(closedSet.Count);
                         return current; 
                     }
                     closedSet.Add((GameState)current);
