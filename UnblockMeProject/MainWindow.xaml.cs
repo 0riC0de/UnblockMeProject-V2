@@ -37,71 +37,185 @@ namespace UnblockMeProject
             //regularBlock = new RegularBlock(GameBoard, 5, 1, 1, 3, true, this, "BlueH_1");
             //regularBlock2 = new RegularBlock(GameBoard, 2, 2, 3, 1, false, this, "Blue_0");
             //regularBlock3 = new RegularBlock(GameBoard, 3, 3, 2, 1, false, this, "Blue_2");
-            /*
-            boardModel.AddBlock(2, 2, "Blue_0");
-            boardModel.AddBlock(3, 2, "Blue_0");
-            boardModel.AddBlock(4, 2, "Blue_0");
+            int option = 3;
 
-            boardModel.AddBlock(2, 3, "Blue_2");
-            boardModel.AddBlock(3, 3, "Blue_2");
+            if (option == 1)
+            {
+                boardModel.AddBlock(2, 2, "Blue_0");
+                boardModel.AddBlock(3, 2, "Blue_0");
+                boardModel.AddBlock(4, 2, "Blue_0");
 
-            boardModel.AddBlock(4, 3, "BlueH_3");
-            boardModel.AddBlock(4, 4, "BlueH_3");
+                boardModel.AddBlock(2, 3, "Blue_2");
+                boardModel.AddBlock(3, 3, "Blue_2");
 
-            boardModel.AddBlock(1, 3, "BlueH_4");
-            boardModel.AddBlock(1, 4, "BlueH_4");
+                boardModel.AddBlock(4, 3, "BlueH_3");
+                boardModel.AddBlock(4, 4, "BlueH_3");
 
-            boardModel.AddBlock(5, 1, "BlueH_1");
-            boardModel.AddBlock(5, 2, "BlueH_1");
-            boardModel.AddBlock(5, 3, "BlueH_1");    // Blue -> color , H -> Horizontal , _1 -> id
+                boardModel.AddBlock(1, 3, "BlueH_4");
+                boardModel.AddBlock(1, 4, "BlueH_4");
 
-            boardModel.AddBlock(1, 1, "BlueH_5");
-            boardModel.AddBlock(1, 2, "BlueH_5");
+                boardModel.AddBlock(5, 1, "BlueH_1");
+                boardModel.AddBlock(5, 2, "BlueH_1");
+                boardModel.AddBlock(5, 3, "BlueH_1");    // Blue -> color , H -> Horizontal , _1 -> id
 
-            boardModel.AddBlock(4, 0, "Blue_6");
-            boardModel.AddBlock(5, 0, "Blue_6");
+                boardModel.AddBlock(1, 1, "BlueH_5");
+                boardModel.AddBlock(1, 2, "BlueH_5");
 
-            boardModel.AddBlock(2, 0, "Red");
-            boardModel.AddBlock(2, 1, "Red");
-            */
-           
-            boardModel.AddBlock(2, 1, "Red");
-            boardModel.AddBlock(2, 2, "Red");
-            
-            boardModel.AddBlock(0, 1, "BlueH_0");
-            boardModel.AddBlock(0, 2, "BlueH_0");
+                boardModel.AddBlock(4, 0, "Blue_6");
+                boardModel.AddBlock(5, 0, "Blue_6");
 
-            boardModel.AddBlock(1, 0, "BlueH_1");
-            boardModel.AddBlock(1, 1, "BlueH_1");
+                boardModel.AddBlock(2, 0, "Red");
+                boardModel.AddBlock(2, 1, "Red");
+            }
 
-            boardModel.AddBlock(3, 1, "BlueH_2");
-            boardModel.AddBlock(3, 2, "BlueH_2");
+            if (option == 2)
+            {
+                
+                boardModel.AddBlock(2, 1, "Red");
+                boardModel.AddBlock(2, 2, "Red");
 
-            boardModel.AddBlock(5, 3, "BlueH_3");
-            boardModel.AddBlock(5, 4, "BlueH_3");
-            boardModel.AddBlock(5, 5, "BlueH_3");
-            
-            boardModel.AddBlock(2, 3, "Blue_4");
-            boardModel.AddBlock(3, 3, "Blue_4");
-            boardModel.AddBlock(4, 3, "Blue_4");
+                boardModel.AddBlock(0, 1, "BlueH_0");
+                boardModel.AddBlock(0, 2, "BlueH_0");
 
-            boardModel.AddBlock(2, 4, "Blue_5");
-            boardModel.AddBlock(3, 4, "Blue_5");
-            boardModel.AddBlock(4, 4, "Blue_5");
+                boardModel.AddBlock(1, 0, "BlueH_1");
+                boardModel.AddBlock(1, 1, "BlueH_1");
 
-            boardModel.AddBlock(2, 5, "Blue_6");
-            boardModel.AddBlock(3, 5, "Blue_6");
-            boardModel.AddBlock(4, 5, "Blue_6");
+                boardModel.AddBlock(3, 0, "BlueH_2");
+                boardModel.AddBlock(3, 1, "BlueH_2");
 
-            boardModel.AddBlock(0, 3, "Blue_7");
-            boardModel.AddBlock(1, 3, "Blue_7");
+                boardModel.AddBlock(5, 3, "BlueH_3");
+                boardModel.AddBlock(5, 4, "BlueH_3");
+                boardModel.AddBlock(5, 5, "BlueH_3");
 
-            boardModel.AddBlock(3, 0, "Blue_8");
-            boardModel.AddBlock(4, 0, "Blue_8");
+                boardModel.AddBlock(2, 3, "Blue_4");
+                boardModel.AddBlock(3, 3, "Blue_4");
+                boardModel.AddBlock(4, 3, "Blue_4");
 
-            boardModel.AddBlock(5, 2, "Blue_9");
-            boardModel.AddBlock(4, 2, "Blue_9");
-            
+                boardModel.AddBlock(2, 4, "Blue_5");
+                boardModel.AddBlock(3, 4, "Blue_5");
+                boardModel.AddBlock(4, 4, "Blue_5");
+
+                boardModel.AddBlock(2, 5, "Blue_6");
+                boardModel.AddBlock(3, 5, "Blue_6");
+                boardModel.AddBlock(4, 5, "Blue_6");
+
+                boardModel.AddBlock(0, 3, "Blue_7");
+                boardModel.AddBlock(1, 3, "Blue_7");
+
+                boardModel.AddBlock(4, 0, "Blue_8");
+                boardModel.AddBlock(5, 0, "Blue_8");
+
+                boardModel.AddBlock(3, 2, "Blue_9");
+                boardModel.AddBlock(4, 2, "Blue_9");
+                
+            }
+
+            if (option == 3)
+            {
+
+                boardModel.AddBlock(2, 1, "Red");
+                boardModel.AddBlock(2, 2, "Red");
+
+                boardModel.AddBlock(0, 0, "BlueH_0");
+                boardModel.AddBlock(0, 1, "BlueH_0");
+
+                boardModel.AddBlock(1, 3, "BlueH_1");
+                boardModel.AddBlock(1, 4, "BlueH_1");
+
+                boardModel.AddBlock(3, 0, "BlueH_2");
+                boardModel.AddBlock(3, 1, "BlueH_2");
+
+                boardModel.AddBlock(4, 3, "BlueH_3");
+                boardModel.AddBlock(4, 4, "BlueH_3");
+
+                boardModel.AddBlock(5, 0, "BlueH_4");
+                boardModel.AddBlock(5, 1, "BlueH_4");
+
+                boardModel.AddBlock(2, 3, "Blue_5");
+                boardModel.AddBlock(3, 3, "Blue_5");
+                boardModel.AddBlock(4, 3, "Blue_5");
+
+                boardModel.AddBlock(2, 5, "Blue_6");
+                boardModel.AddBlock(3, 5, "Blue_6");
+                boardModel.AddBlock(4, 5, "Blue_6");
+            }
+
+            if (option == 4)
+            {
+                // Red block (A)
+                boardModel.AddBlock(2, 2, "Red");
+                boardModel.AddBlock(2, 3, "Red");
+
+                // Blue blocks
+                // B: Horizontal
+                boardModel.AddBlock(0, 1, "BlueH_0");
+                boardModel.AddBlock(0, 2, "BlueH_0");
+
+
+                // C: Horizontal
+                boardModel.AddBlock(3, 0, "BlueH_1");
+                boardModel.AddBlock(3, 1, "BlueH_1");
+                boardModel.AddBlock(3, 2, "BlueH_1");
+
+
+                // D: Horizontal
+                boardModel.AddBlock(4, 4, "BlueH_2");
+                boardModel.AddBlock(4, 5, "BlueH_2");
+
+                // E: Horizontal
+                boardModel.AddBlock(5, 0, "BlueH_3");
+                boardModel.AddBlock(5, 1, "BlueH_3");
+
+                // F: Horizontal
+                boardModel.AddBlock(5, 3, "BlueH_4");
+                boardModel.AddBlock(5, 4, "BlueH_4");
+
+                // G: Vertical
+                boardModel.AddBlock(0, 0, "Blue_5");
+                boardModel.AddBlock(1, 0, "Blue_5");
+                boardModel.AddBlock(2, 0, "Blue_5");
+
+                // H: Vertical
+                boardModel.AddBlock(1, 1, "Blue_6");
+                boardModel.AddBlock(2, 1, "Blue_6");
+
+                // I: Vertical
+                boardModel.AddBlock(1, 2, "Blue_7");
+                boardModel.AddBlock(2, 2, "Blue_7");
+
+                // J: Vertical
+                boardModel.AddBlock(3, 1, "Blue_8");
+                boardModel.AddBlock(4, 1, "Blue_8");
+                boardModel.AddBlock(5, 1, "Blue_8");
+
+                // K: Vertical
+                boardModel.AddBlock(3, 2, "Blue_9");
+                boardModel.AddBlock(4, 2, "Blue_9");
+
+                // L: Vertical
+                boardModel.AddBlock(0, 4, "Blue_10");
+                boardModel.AddBlock(1, 4, "Blue_10");
+                boardModel.AddBlock(2, 4, "Blue_10");
+            }
+            if (option == 5)
+            {
+                boardModel.AddBlock(2, 0, "Red");
+                boardModel.AddBlock(2, 0, "Red");
+
+                boardModel.AddBlock(2, 2, "Blue_1");
+                boardModel.AddBlock(3, 2, "Blue_1");
+
+                boardModel.AddBlock(1,1, "BlueH_2");
+                boardModel.AddBlock(1, 2, "BlueH_2");
+
+
+
+
+            }
+
+
+
+
 
 
             gameState = new GameState();
@@ -109,6 +223,7 @@ namespace UnblockMeProject
             gameState.CalculateCost();
             gameState = solver.Solver(gameState);
             List<GameState> states = gameState.ShowPath();
+           
 
 
            StartVisualization(states);

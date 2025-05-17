@@ -23,80 +23,168 @@ namespace UnblockMeProject
 
 
 
+        // gives the block if given one position. output if horizontal arr[Max(x) , y , span , 1 -horizontal]
+        // output if NotHorizontal arr[max(y) , x , span , 0 - Nothorizontal]
         public void CalculateCost()
         {
             this.Cost = 0;
-            bool checkd = false;
-            int start = State.GetRed();
+            int start = State.GetRed(); // gives the last column of red rec
 
-            // ➡️ Add Manhattan Distance (distance from red to the goal)
-            int distanceToExit = 5 - start;  // The number of spaces left
-            this.Cost += distanceToExit;
+            // HashSet to track visited blocks to prevent counting the same block multiple times
+            HashSet<string> visitedBlocks = new HashSet<string>();
 
+            // Count blocks directly blocking red
+            int directBlockersCount = 0;
+            int manhattanDistance = 5 - (start + 1);
+            this.Cost += manhattanDistance/2;
             for (int i = start + 1; i <= 5; i++)
             {
-                if (!State.IsMoveValid(2, i))
+                if (!State.IsMoveValid(2, i)) // 2 is the row of red
                 {
-                    checkd = false;
-                    this.Cost++;
+                    directBlockersCount++;
+                    // Get the block at this position
+                    (int[] block, string blockName) = State.GetBlock(2, i);
+                    visitedBlocks.Add(blockName);
 
-                    (int[] Block, string blockName) = State.GetBlock(2, i);
-
-                    if (Block[3] == 0) // Vertical Block
+                    if (block[3] == 0) // Vertical block blocking red
                     {
-                        if (Block[2] == 3)
-                        {
-                            if (!State.IsMoveValid(Block[X] + 1, Block[Y]))
-                            {
-                                this.Cost++;
-                                checkd = true;
+                        // First layer Less Priority
+                        this.Cost += 5;
 
-                                //  **Extra Layer of Depth**
-                                if (!State.IsMoveValid(Block[X] + 2, Block[Y]))
-                                {
-                                    this.Cost++;
-                                    (int[] NextBlock, string nextBlockName) = State.GetBlock(Block[X] + 1, Block[Y]);
-
-                                    // If the next block is also blocked
-                                    if (!State.IsMoveValid(NextBlock[X] + 1, NextBlock[Y]))
-                                    {
-                                        this.Cost += 3; // ⬆️ Increase penalty to make it stronger
-                                    }
-                                }
-                            }
-                            if (!State.IsMoveValid(5, Block[Y]) && Block[X] + 1 != 5)
-                            {
-                                this.Cost++;
-                            }
-                        }
-
-                        if (Block[2] < 3)
-                        {
-                            if (!State.IsMoveValid(Block[X] - Block[Span], Block[Y]))
-                            {
-                                this.Cost++;
-
-                                //  **Extra Layer of Depth**
-                                if (!State.IsMoveValid(Block[X] - Block[Span] - 1, Block[Y]))
-                                {
-                                    this.Cost++;
-                                    (int[] NextBlock, string nextBlockName) = State.GetBlock(Block[X] - Block[Span], Block[Y]);
-
-                                    // If the next block is also blocked
-                                    if (!State.IsMoveValid(NextBlock[X] - NextBlock[Span], NextBlock[Y]))
-                                    {
-                                        this.Cost += 3; // ⬆️ Increase penalty to make it stronger
-                                    }
-                                }
-                            }
-                            else if (checkd)
-                            {
-                                Cost--;
-                            }
-                        }
+                        // Check recursive blockage
+                        ExamineBlockMobility(block, blockName, visitedBlocks, 1);
                     }
                 }
             }
+
+            // Base cost on direct blockers - minimum cost is always at least equal to direct blockers
+            this.Cost = Math.Max(this.Cost, directBlockersCount);
+        }
+
+        private void ExamineBlockMobility(int[] block, string blockName, HashSet<string> visitedBlocks, int depth)
+        {
+            if (depth >= 7) // Maximum depth of 7
+                return;
+
+            int mobilityScore = 2; // Start with assumption of mobility
+
+            if (block[3] == 0) // Vertical block
+            {
+                bool canMoveUp = false;
+                bool canMoveDown = false;
+
+                // Check if the block can move down
+                if (block[X] + 1 <= 5) // Not at the bottom edge
+                {
+                    if (State.IsMoveValid(block[X] + 1, block[Y]))
+                    {
+                        canMoveDown = true;
+                    }
+                    else
+                    {
+                        // Calculate cost for the downward blocker
+                        (int[] blockerBlock, string blockerName) = State.GetBlock(block[X] + 1, block[Y]);
+
+                        if (!visitedBlocks.Contains(blockerName))
+                        {
+                            visitedBlocks.Add(blockerName);
+                            this.Cost += depth; // Higher weight for blocks at lower depths
+                            ExamineBlockMobility(blockerBlock, blockerName, visitedBlocks, depth + 1);
+                        }
+                    }
+                }
+
+                // Check if the block can move up
+                if (block[X] - block[Span] >= 0) // Not at the top edge
+                {
+                    if (State.IsMoveValid(block[X] - block[Span], block[Y]))
+                    {
+                        canMoveUp = true;
+                    }
+                    else
+                    {
+                        // Calculate cost for the upward blocker
+                        (int[] blockerBlock, string blockerName) = State.GetBlock(block[X] - block[Span], block[Y]);
+
+                        if (!visitedBlocks.Contains(blockerName))
+                        {
+                            visitedBlocks.Add(blockerName);
+                            this.Cost += depth;
+                            ExamineBlockMobility(blockerBlock, blockerName, visitedBlocks, depth + 1);
+                        }
+                    }
+                }
+
+                // Adjust mobility score based on freedom of movement
+                if (canMoveUp || canMoveDown)
+                {
+                    mobilityScore = 0; // Good mobility
+                }
+                else
+                {
+                    mobilityScore = 3; // Poor mobility
+                }
+            }
+            else // Horizontal block
+            {
+                bool canMoveLeft = false;
+                bool canMoveRight = false;
+
+                // Check if the block can move left
+                if (block[Y] - 1 >= 0) // Not at the left edge
+                {
+                    if (State.IsMoveValid(block[X], block[Y] - 1))
+                    {
+                        canMoveLeft = true;
+                    }
+                    else
+                    {
+                        // Calculate cost for the leftward blocker
+                        (int[] blockerBlock, string blockerName) = State.GetBlock(block[X], block[Y] - 1);
+
+                        if (!visitedBlocks.Contains(blockerName))
+                        {
+                            visitedBlocks.Add(blockerName);
+                            this.Cost += depth;
+                            ExamineBlockMobility(blockerBlock, blockerName, visitedBlocks, depth + 1);
+                        }
+                    }
+                }
+
+                // Check if the block can move right
+                if (block[Y] + block[Span] <= 5) // Not at the right edge
+                {
+                    if (State.IsMoveValid(block[X], block[Y] + block[Span]))
+                    {
+                        canMoveRight = true;
+                    }
+                    else
+                    {
+                        // Calculate cost for the rightward blocker
+                        (int[] blockerBlock, string blockerName) = State.GetBlock(block[X], block[Y] + block[Span]);
+
+                        if (!visitedBlocks.Contains(blockerName))
+                        {
+                            visitedBlocks.Add(blockerName);
+                            this.Cost +=  depth;
+                            ExamineBlockMobility(blockerBlock, blockerName, visitedBlocks, depth + 1);
+                        }
+                    }
+                }
+
+                // Adjust mobility score based on freedom of movement
+                if (canMoveLeft || canMoveRight)
+                {
+                    mobilityScore = 0; // Good mobility
+                }
+                else
+                {
+                    mobilityScore = 3; // Poor mobility
+                }
+            }
+
+            // Add mobility score to total cost
+            this.Cost += mobilityScore;
         }
 
 
