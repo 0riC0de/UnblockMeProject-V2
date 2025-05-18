@@ -36,7 +36,7 @@ namespace UnblockMeProject
             // Count blocks directly blocking red
             int directBlockersCount = 0;
             int manhattanDistance = 5 - (start + 1);
-            this.Cost += manhattanDistance/2;
+            this.Cost += manhattanDistance / 2;
             for (int i = start + 1; i <= 5; i++)
             {
                 if (!State.IsMoveValid(2, i)) // 2 is the row of red
@@ -66,7 +66,7 @@ namespace UnblockMeProject
             if (depth >= 7) // Maximum depth of 7
                 return;
 
-            int mobilityScore = 2; // Start with assumption of mobility
+            int mobilityScore = 0;
 
             if (block[3] == 0) // Vertical block
             {
@@ -88,7 +88,7 @@ namespace UnblockMeProject
                         if (!visitedBlocks.Contains(blockerName))
                         {
                             visitedBlocks.Add(blockerName);
-                            this.Cost += depth; // Higher weight for blocks at lower depths
+                            this.Cost += 1; // Higher weight for blocks at lower depths
                             ExamineBlockMobility(blockerBlock, blockerName, visitedBlocks, depth + 1);
                         }
                     }
@@ -109,7 +109,7 @@ namespace UnblockMeProject
                         if (!visitedBlocks.Contains(blockerName))
                         {
                             visitedBlocks.Add(blockerName);
-                            this.Cost += depth;
+                            this.Cost += 1;
                             ExamineBlockMobility(blockerBlock, blockerName, visitedBlocks, depth + 1);
                         }
                     }
@@ -122,7 +122,7 @@ namespace UnblockMeProject
                 }
                 else
                 {
-                    mobilityScore = 3; // Poor mobility
+                    mobilityScore = 1; // Poor mobility
                 }
             }
             else // Horizontal block
@@ -145,7 +145,7 @@ namespace UnblockMeProject
                         if (!visitedBlocks.Contains(blockerName))
                         {
                             visitedBlocks.Add(blockerName);
-                            this.Cost += depth;
+                            this.Cost += 1;
                             ExamineBlockMobility(blockerBlock, blockerName, visitedBlocks, depth + 1);
                         }
                     }
@@ -166,7 +166,7 @@ namespace UnblockMeProject
                         if (!visitedBlocks.Contains(blockerName))
                         {
                             visitedBlocks.Add(blockerName);
-                            this.Cost +=  depth;
+                            this.Cost +=  1;
                             ExamineBlockMobility(blockerBlock, blockerName, visitedBlocks, depth + 1);
                         }
                     }
@@ -179,7 +179,7 @@ namespace UnblockMeProject
                 }
                 else
                 {
-                    mobilityScore = 3; // Poor mobility
+                    mobilityScore = 1; // Poor mobility
                 }
             }
 

@@ -61,6 +61,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="BoardSelectionDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -71,6 +75,9 @@
     </Compile>
     <Compile Include="AStarSearcher.cs" />
     <Compile Include="BoardModel.cs" />
+    <Compile Include="BoardSelectionDialog.xaml.cs">
+      <DependentUpon>BoardSelectionDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GameState.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -109,6 +116,24 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Board2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Board6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Board1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Board5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Board3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Board4.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -6,6 +6,8 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
 
 
@@ -13,7 +15,7 @@ namespace UnblockMeProject
 {
     internal class AStarSearcher
     {
-        public GameState Solver(GameState gameState)
+        public GameState Solver(GameState gameState , int depth)
         {
             SimplePriorityQueue<GameState> openSet = new SimplePriorityQueue<GameState>();
             Dictionary<GameState, int> gScore = new Dictionary<GameState, int>();
@@ -22,13 +24,14 @@ namespace UnblockMeProject
             openSet.Enqueue(gameState, (int)gameState.Cost);
             int count = gameState.State.occupiedPositions.Count;
             HashSet<GameState> closedSet = new HashSet<GameState>();
-
+            int min = 50;
             GameState current = new GameState();
 
             while (openSet.Count() > 0)
             {
                 current = openSet.Dequeue();
-
+                if (current.Cost < min)
+                    min = current.Cost;
                 if (current.Cost <= 0)
                 {
                     Console.WriteLine("Goal Found! Path reconstruction needed.");
@@ -49,7 +52,7 @@ namespace UnblockMeProject
                 closedSet.Add(current);
 
                 // Generate triple-depth successors
-                if (count > 24)
+                if (depth == 3)
                 {
                     foreach (var neighbor in TripleDepthSuccessors(current))
                     {
@@ -70,7 +73,7 @@ namespace UnblockMeProject
                         }
                     }
                 }
-                else if(count > 15)
+                else if(depth == 2)
                 {
                     foreach (var neighbor in DoubleDepthSuccessors(current))
                     {
@@ -91,7 +94,7 @@ namespace UnblockMeProject
                         }
                     }
                 }
-                else if(count <= 15)
+                else if(depth == 1)
                 {
                     foreach (var neighbor in current.GetSuccessorStates())
                     {
