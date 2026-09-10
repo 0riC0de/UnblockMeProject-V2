@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,10 +19,6 @@ namespace UnblockMeProject
 
     public partial class MainWindow : Window
     {
-        private RedBlock redBlock;
-        private RegularBlock regularBlock;
-        private RegularBlock regularBlock2;
-        private RegularBlock regularBlock3;
         private List<GameState> _GameStates;
         private DispatcherTimer _timer;
         private int _currentIndex = 0;
@@ -151,7 +147,6 @@ namespace UnblockMeProject
 
                 boardModel.AddBlock(2, 3, "Blue_5");
                 boardModel.AddBlock(3, 3, "Blue_5");
-                boardModel.AddBlock(4, 3, "Blue_5");
 
                 boardModel.AddBlock(2, 5, "Blue_6");
                 boardModel.AddBlock(3, 5, "Blue_6");
@@ -236,27 +231,100 @@ namespace UnblockMeProject
 
                 boardModel.AddBlock(4, 2, "BlueH_10");
                 boardModel.AddBlock(4, 3, "BlueH_10");
-
-                boardModel.AddBlock(4, 0, "Blue_2");
-                boardModel.AddBlock(5, 0, "Blue_2");
-
             }
 
+            if (option == 7)
+            {
+                // Hard Level 1 (27 steps)
+                boardModel.AddBlock(2, 1, "Red");
+                boardModel.AddBlock(2, 2, "Red");
 
+                boardModel.AddBlock(4, 0, "Blue_4");
+                boardModel.AddBlock(5, 0, "Blue_4");
 
+                boardModel.AddBlock(1, 4, "BlueH_7");
+                boardModel.AddBlock(1, 5, "BlueH_7");
 
+                boardModel.AddBlock(0, 0, "BlueH_5");
+                boardModel.AddBlock(0, 1, "BlueH_5");
+                boardModel.AddBlock(0, 2, "BlueH_5");
 
+                boardModel.AddBlock(0, 3, "Blue_9");
+                boardModel.AddBlock(1, 3, "Blue_9");
+                boardModel.AddBlock(2, 3, "Blue_9");
+
+                boardModel.AddBlock(5, 3, "BlueH_6");
+                boardModel.AddBlock(5, 4, "BlueH_6");
+                boardModel.AddBlock(5, 5, "BlueH_6");
+
+                boardModel.AddBlock(4, 3, "BlueH_10");
+                boardModel.AddBlock(4, 4, "BlueH_10");
+
+                boardModel.AddBlock(4, 2, "Blue_3");
+                boardModel.AddBlock(5, 2, "Blue_3");
+
+                boardModel.AddBlock(2, 0, "Blue_0");
+                boardModel.AddBlock(3, 0, "Blue_0");
+
+                boardModel.AddBlock(3, 2, "BlueH_8");
+                boardModel.AddBlock(3, 3, "BlueH_8");
+
+                boardModel.AddBlock(2, 5, "Blue_1");
+                boardModel.AddBlock(3, 5, "Blue_1");
+            }
+
+            if (option == 8)
+            {
+                // Expert Level 2 (33 steps)
+                boardModel.AddBlock(2, 0, "Red");
+                boardModel.AddBlock(2, 1, "Red");
+
+                boardModel.AddBlock(1, 3, "BlueH_4");
+                boardModel.AddBlock(1, 4, "BlueH_4");
+
+                boardModel.AddBlock(5, 1, "BlueH_9");
+                boardModel.AddBlock(5, 2, "BlueH_9");
+
+                boardModel.AddBlock(0, 3, "BlueH_1");
+                boardModel.AddBlock(0, 4, "BlueH_1");
+
+                boardModel.AddBlock(0, 1, "Blue_6");
+                boardModel.AddBlock(1, 1, "Blue_6");
+
+                boardModel.AddBlock(0, 5, "Blue_2");
+                boardModel.AddBlock(1, 5, "Blue_2");
+                boardModel.AddBlock(2, 5, "Blue_2");
+
+                boardModel.AddBlock(4, 0, "Blue_0");
+                boardModel.AddBlock(5, 0, "Blue_0");
+
+                boardModel.AddBlock(0, 2, "Blue_3");
+                boardModel.AddBlock(1, 2, "Blue_3");
+                boardModel.AddBlock(2, 2, "Blue_3");
+
+                boardModel.AddBlock(4, 1, "BlueH_7");
+                boardModel.AddBlock(4, 2, "BlueH_7");
+
+                boardModel.AddBlock(4, 4, "Blue_8");
+                boardModel.AddBlock(5, 4, "Blue_8");
+
+                boardModel.AddBlock(4, 3, "Blue_5");
+                boardModel.AddBlock(5, 3, "Blue_5");
+            }
 
             gameState = new GameState();
             gameState.initializeState(boardModel);
             gameState.CalculateCost();
-            gameState = solver.Solver(gameState , depth);
-            List<GameState> states = gameState.ShowPath();
-           
-
-
-           StartVisualization(states);
-
+            gameState = solver.Solver(gameState, depth);
+            if (gameState != null)
+            {
+                List<GameState> states = gameState.ShowPath();
+                StartVisualization(states);
+            }
+            else
+            {
+                MessageBox.Show("No solution found for this board configuration.", "Solver Result", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
         public bool OnBlockMove(int newRow, int newCol, string color, int span, bool isHorizontal)
         {
@@ -316,9 +384,18 @@ namespace UnblockMeProject
             _currentIndex = gameStates.Count - 1;
             _GameStates = gameStates;
 
+            // Draw initial board configuration immediately
+            if (_currentIndex >= 0)
+            {
+                GameBoard.Children.Clear();
+                boardModel = _GameStates[_currentIndex].State;
+                boardModel.DrawBoard(GameBoard, this);
+                _currentIndex--;
+            }
+
             _timer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(1) // Change the interval if you want it faster or slower
+                Interval = TimeSpan.FromSeconds(0.7) // Smooth 700ms animation interval
             };
 
             _timer.Tick += UpdateBoard;
@@ -328,13 +405,14 @@ namespace UnblockMeProject
         {
             if (_currentIndex < 0)
             {
-                _timer.Stop(); // Stop the timer if we are at the end
+                _timer.Stop(); // Stop the timer when reaching the solution
                 return;
             }
 
             // Clear the grid and draw the next state
             GameBoard.Children.Clear();
-            _GameStates[_currentIndex].State.DrawBoard(GameBoard, this);
+            boardModel = _GameStates[_currentIndex].State;
+            boardModel.DrawBoard(GameBoard, this);
 
             _currentIndex--;
         }

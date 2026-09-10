@@ -1,116 +1,79 @@
-﻿
 using Priority_Queue;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-
 
 namespace UnblockMeProject
 {
-    internal class AStarSearcher
+    public class AStarSearcher
     {
-        public GameState Solver(GameState gameState , int depth)
+        public GameState Solver(GameState gameState, int depth)
         {
-            SimplePriorityQueue<GameState> openSet = new SimplePriorityQueue<GameState>();
+            SimplePriorityQueue<GameState, int> openSet = new SimplePriorityQueue<GameState, int>();
             Dictionary<GameState, int> gScore = new Dictionary<GameState, int>();
-            gScore[gameState] = 0;
-            var cameFrom = new Dictionary<GameState, GameState>();
-            openSet.Enqueue(gameState, (int)gameState.Cost);
-            int count = gameState.State.occupiedPositions.Count;
             HashSet<GameState> closedSet = new HashSet<GameState>();
-            int min = 50;
-            GameState current = new GameState();
+            Dictionary<GameState, GameState> canonicalOpenNodes = new Dictionary<GameState, GameState>();
 
-            while (openSet.Count() > 0)
+            int weight = Math.Max(1, depth);
+
+            gameState.CalculateCost();
+            gScore[gameState] = 0;
+            openSet.Enqueue(gameState, weight * gameState.Cost);
+            canonicalOpenNodes[gameState] = gameState;
+
+            while (openSet.Count > 0)
             {
-                current = openSet.Dequeue();
-                if (current.Cost < min)
-                    min = current.Cost;
-                if (current.Cost <= 0)
+                GameState current = openSet.Dequeue();
+                canonicalOpenNodes.Remove(current);
+
+                if (closedSet.Contains(current))
+                    continue;
+
+                closedSet.Add(current);
+
+                if (current.IsGoal())
                 {
-                    Console.WriteLine("Goal Found! Path reconstruction needed.");
-                    Console.WriteLine(closedSet.Count);
-                    for (int i = 0; i < 3; i++)
+                    // If Red is not yet at col 5, advance step by step to the exit
+                    while (current.State.GetRed() < 5)
                     {
-                        foreach (var state in current.GetSuccessorStates())
+                        GameState next = null;
+                        foreach (var succ in current.GetSuccessorStates())
                         {
-                            int red = state.State.GetRed();
-                            if (red > current.State.GetRed())
+                            if (succ.State.GetRed() > current.State.GetRed())
                             {
-                                current = state;
+                                next = succ;
+                                break;
                             }
                         }
+                        if (next != null)
+                            current = next;
+                        else
+                            break;
                     }
                     return current;
                 }
-                closedSet.Add(current);
 
-                // Generate triple-depth successors
-                if (depth == 3)
+                int currentG = gScore[current];
+                foreach (var neighbor in current.GetSuccessorStates())
                 {
-                    foreach (var neighbor in TripleDepthSuccessors(current))
+                    if (closedSet.Contains(neighbor))
+                        continue;
+
+                    int tentativeGScore = currentG + 1;
+                    int currentNeighborGScore = gScore.TryGetValue(neighbor, out int knownScore) ? knownScore : int.MaxValue;
+
+                    if (tentativeGScore < currentNeighborGScore)
                     {
-                        if (closedSet.Contains(neighbor))
+                        gScore[neighbor] = tentativeGScore;
+                        int neighborFScore = tentativeGScore + weight * neighbor.Cost;
+
+                        if (canonicalOpenNodes.TryGetValue(neighbor, out GameState existing))
                         {
-                            continue;
+                            existing.Previous = current;
+                            openSet.UpdatePriority(existing, neighborFScore);
                         }
-
-                        int tentativeGScore = gScore[current] + 1;
-                        int currentNeighborGScore = gScore.TryGetValue(neighbor, out int knownScore) ? knownScore : int.MaxValue;
-
-                        if (tentativeGScore < currentNeighborGScore)
+                        else
                         {
-                            cameFrom[neighbor] = current;
-                            gScore[neighbor] = tentativeGScore;
-                            int neighborFScore = tentativeGScore + (int)neighbor.Cost;
-                            openSet.Enqueue(neighbor, neighborFScore);
-                        }
-                    }
-                }
-                else if(depth == 2)
-                {
-                    foreach (var neighbor in DoubleDepthSuccessors(current))
-                    {
-                        if (closedSet.Contains(neighbor))
-                        {
-                            continue;
-                        }
-
-                        int tentativeGScore = gScore[current] + 1;
-                        int currentNeighborGScore = gScore.TryGetValue(neighbor, out int knownScore) ? knownScore : int.MaxValue;
-
-                        if (tentativeGScore < currentNeighborGScore)
-                        {
-                            cameFrom[neighbor] = current;
-                            gScore[neighbor] = tentativeGScore;
-                            int neighborFScore = tentativeGScore + (int)neighbor.Cost;
-                            openSet.Enqueue(neighbor, neighborFScore);
-                        }
-                    }
-                }
-                else if(depth == 1)
-                {
-                    foreach (var neighbor in current.GetSuccessorStates())
-                    {
-                        if (closedSet.Contains(neighbor))
-                        {
-                            continue;
-                        }
-
-                        int tentativeGScore = gScore[current] + 1;
-                        int currentNeighborGScore = gScore.TryGetValue(neighbor, out int knownScore) ? knownScore : int.MaxValue;
-
-                        if (tentativeGScore < currentNeighborGScore)
-                        {
-                            cameFrom[neighbor] = current;
-                            gScore[neighbor] = tentativeGScore;
-                            int neighborFScore = tentativeGScore + (int)neighbor.Cost;
+                            canonicalOpenNodes[neighbor] = neighbor;
                             openSet.Enqueue(neighbor, neighborFScore);
                         }
                     }
@@ -118,38 +81,5 @@ namespace UnblockMeProject
             }
             return null;
         }
-
-        // Triple depth successor generation
-        private List<GameState> TripleDepthSuccessors(GameState gameState)
-        {
-            List<GameState> tripleSuccessors = new List<GameState>();
-
-            foreach (var first in gameState.GetSuccessorStates())
-            {
-                foreach (var second in first.GetSuccessorStates())
-                {
-                    foreach (var third in second.GetSuccessorStates())
-                    {
-                        tripleSuccessors.Add(third);
-                    }
-                }
-            }
-            return tripleSuccessors;
-        }
-
-        private List<GameState> DoubleDepthSuccessors(GameState gameState)
-        {
-            List<GameState> doubleSuccessors = new List<GameState>();
-
-            foreach (var first in gameState.GetSuccessorStates())
-            {
-                foreach (var second in first.GetSuccessorStates())
-                {
-                    doubleSuccessors.Add(second);
-                }
-            }
-            return doubleSuccessors;
-        }
     }
 }
-

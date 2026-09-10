@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -7,7 +7,7 @@ namespace UnblockMeProject
     public partial class BoardSelectionDialog : Window
     {
         public int SelectedBoard { get; private set; } = 1; // Default to board 1
-        public int SelectedDepth { get; private set; } = 3; // Default to depth 3
+        public int SelectedDepth { get; private set; } = 1; // Default to depth 3
 
         public BoardSelectionDialog()
         {
@@ -56,6 +56,9 @@ namespace UnblockMeProject
             if (Board4Image != null) Board4Image.Visibility = Visibility.Collapsed;
             if (Board5Image != null) Board5Image.Visibility = Visibility.Collapsed;
             if (Board6Image != null) Board6Image.Visibility = Visibility.Collapsed;
+            if (Board7Image != null) Board7Image.Visibility = Visibility.Collapsed;
+            if (Board8Image != null) Board8Image.Visibility = Visibility.Collapsed;
+            if (FallbackText != null) FallbackText.Visibility = Visibility.Collapsed;
         }
 
         private void ShowSelectedImage(int selectedIndex)
@@ -82,6 +85,12 @@ namespace UnblockMeProject
                     case 5:
                         if (Board6Image != null) Board6Image.Visibility = Visibility.Visible;
                         break;
+                    case 6:
+                        if (Board7Image != null) Board7Image.Visibility = Visibility.Visible;
+                        break;
+                    case 7:
+                        if (Board8Image != null) Board8Image.Visibility = Visibility.Visible;
+                        break;
                 }
             }
             catch (Exception ex)
@@ -103,22 +112,28 @@ namespace UnblockMeProject
             switch (boardIndex)
             {
                 case 0:
-                    BoardDescriptionText.Text = "";
+                    BoardDescriptionText.Text = "Beginner (10 steps). Simple opening puzzle.";
                     break;
                 case 1:
-                    BoardDescriptionText.Text = "Hard! Use Depth 3";
+                    BoardDescriptionText.Text = "Hard (18 steps). Multiple overlapping vertical blockers.";
                     break;
                 case 2:
-                    BoardDescriptionText.Text = "Use depth 1";
+                    BoardDescriptionText.Text = "Beginner (8 steps). Direct path clearing.";
                     break;
                 case 3:
-                    BoardDescriptionText.Text = "Use Depth 1";
+                    BoardDescriptionText.Text = "Intermediate (18 steps). High blocker density.";
                     break;
                 case 4:
-                    BoardDescriptionText.Text = "Use Depth 1";
+                    BoardDescriptionText.Text = "Intermediate (13 steps). Multi-corridor maneuvers.";
                     break;
                 case 5:
-                    BoardDescriptionText.Text = "Use Depth 1";
+                    BoardDescriptionText.Text = "Intermediate (9 steps). Compact arrangement.";
+                    break;
+                case 6:
+                    BoardDescriptionText.Text = "Hard (27 steps). 11 blocks requiring multi-stage cascading moves.";
+                    break;
+                case 7:
+                    BoardDescriptionText.Text = "Expert (33 steps). Deep search graph requiring optimal clearing maneuvers.";
                     break;
 
                 default:

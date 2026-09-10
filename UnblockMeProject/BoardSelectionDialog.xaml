@@ -1,4 +1,4 @@
-﻿<Window x:Class="UnblockMeProject.BoardSelectionDialog"
+<Window x:Class="UnblockMeProject.BoardSelectionDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Select Board" Height="450" Width="400" WindowStartupLocation="CenterOwner">
@@ -16,12 +16,14 @@
 
         <ComboBox Grid.Row="1" x:Name="BoardComboBox" Margin="0,0,0,15" 
                   SelectionChanged="BoardComboBox_SelectionChanged">
-            <ComboBoxItem Content="Board 1"/>
-            <ComboBoxItem Content="Board 2"/>
-            <ComboBoxItem Content="Board 3"/>
-            <ComboBoxItem Content="Board 4"/>
-            <ComboBoxItem Content="Board 5"/>
-            <ComboBoxItem Content="Board 6"/>
+            <ComboBoxItem Content="Board 1 (Beginner)"/>
+            <ComboBoxItem Content="Board 2 (Hard)"/>
+            <ComboBoxItem Content="Board 3 (Beginner)"/>
+            <ComboBoxItem Content="Board 4 (Intermediate)"/>
+            <ComboBoxItem Content="Board 5 (Intermediate)"/>
+            <ComboBoxItem Content="Board 6 (Intermediate)"/>
+            <ComboBoxItem Content="Board 7 (Hard - 27 moves)"/>
+            <ComboBoxItem Content="Board 8 (Expert - 33 moves)"/>
         </ComboBox>
 
         <!-- Board Preview Images -->
@@ -34,6 +36,8 @@
                 <Image x:Name="Board4Image" Visibility="Collapsed" Source="Images/Board4.png" Stretch="Uniform" />
                 <Image x:Name="Board5Image" Visibility="Collapsed" Source="Images/Board5.png" Stretch="Uniform" />
                 <Image x:Name="Board6Image" Visibility="Collapsed" Source="Images/Board6.png" Stretch="Uniform" />
+                <Image x:Name="Board7Image" Visibility="Collapsed" Source="Images/Board7.png" Stretch="Uniform" />
+                <Image x:Name="Board8Image" Visibility="Collapsed" Source="Images/Board8.png" Stretch="Uniform" />
 
                 <!-- Fallback text if images aren't loaded -->
                 <TextBlock x:Name="FallbackText" Visibility="Collapsed" 
@@ -45,7 +49,7 @@
         <TextBlock Grid.Row="3" x:Name="BoardDescriptionText" TextWrapping="Wrap" 
                    Margin="0,0,0,15" Height="40"/>
 
-        <TextBlock Grid.Row="4" Text="Select Depth (1-3):" FontWeight="Bold" Margin="0,0,0,10"/>
+        <TextBlock Grid.Row="4" Text="Select Search Mode / Boost (1=Optimal, 2=Fast, 3=Turbo):" FontWeight="Bold" Margin="0,0,0,10"/>
 
         <Grid Grid.Row="5">
             <Grid.ColumnDefinitions>
@@ -57,7 +61,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Slider Grid.Row="0" Grid.Column="0" x:Name="DepthSlider" Minimum="1" Maximum="3" Value="3" 
+            <Slider Grid.Row="0" Grid.Column="0" x:Name="DepthSlider" Minimum="1" Maximum="3" Value="1" 
                     TickPlacement="BottomRight" TickFrequency="1" IsSnapToTickEnabled="True"
                     Margin="0,0,10,5"/>
 

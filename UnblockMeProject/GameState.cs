@@ -1,279 +1,185 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Documents;
-using System.Windows.Media.Animation;
 
 namespace UnblockMeProject
 {
-
-    public class GameState
+    public class GameState : IEquatable<GameState>
     {
-        // for readability of the format from the GetBlock Func 
         private const int X = 0;
         private const int Y = 1;
         private const int Span = 2;
         private const int IsHorizontal = 3;
 
-        public BoardModel State;
-        private GameState Previous { get; set; }
+        public BoardModel State { get; set; }
+        public GameState Previous { get; set; }
         public int Cost { get; set; }
 
+        private string _stateKey;
+        private int _hashCode;
+        private bool _hasHash;
 
+        public string GetStateKey()
+        {
+            if (_stateKey == null && State != null)
+            {
+                _stateKey = State.GetStateKey();
+            }
+            return _stateKey;
+        }
 
-        // gives the block if given one position. output if horizontal arr[Max(x) , y , span , 1 -horizontal]
-        // output if NotHorizontal arr[max(y) , x , span , 0 - Nothorizontal]
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as GameState);
+        }
+
+        public bool Equals(GameState other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
+            return string.Equals(this.GetStateKey(), other.GetStateKey(), StringComparison.Ordinal);
+        }
+
+        public override int GetHashCode()
+        {
+            if (!_hasHash)
+            {
+                _hashCode = GetStateKey() != null ? GetStateKey().GetHashCode() : 0;
+                _hasHash = true;
+            }
+            return _hashCode;
+        }
+
+        public bool IsGoal()
+        {
+            if (State == null) return false;
+            int red = State.GetRed();
+            if (red >= 5) return true;
+            for (int col = red + 1; col <= 5; col++)
+            {
+                if (!State.IsMoveValid(2, col))
+                    return false;
+            }
+            return true;
+        }
+
         public void CalculateCost()
         {
-            this.Cost = 0;
-            int start = State.GetRed(); // gives the last column of red rec
-
-            // HashSet to track visited blocks to prevent counting the same block multiple times
-            HashSet<string> visitedBlocks = new HashSet<string>();
-
-            // Count blocks directly blocking red
-            int directBlockersCount = 0;
-            int manhattanDistance = 5 - (start + 1);
-            this.Cost += manhattanDistance / 2;
-            for (int i = start + 1; i <= 5; i++)
+            if (State == null)
             {
-                if (!State.IsMoveValid(2, i)) // 2 is the row of red
-                {
-                    directBlockersCount++;
-                    // Get the block at this position
-                    (int[] block, string blockName) = State.GetBlock(2, i);
-                    visitedBlocks.Add(blockName);
-
-                    if (block[3] == 0) // Vertical block blocking red
-                    {
-                        // First layer Less Priority
-                        this.Cost += 5;
-
-                        // Check recursive blockage
-                        ExamineBlockMobility(block, blockName, visitedBlocks, 1);
-                    }
-                }
-            }
-
-            // Base cost on direct blockers - minimum cost is always at least equal to direct blockers
-            this.Cost = Math.Max(this.Cost, directBlockersCount);
-        }
-
-        private void ExamineBlockMobility(int[] block, string blockName, HashSet<string> visitedBlocks, int depth)
-        {
-            if (depth >= 7) // Maximum depth of 7
+                this.Cost = 0;
                 return;
-
-            int mobilityScore = 0;
-
-            if (block[3] == 0) // Vertical block
-            {
-                bool canMoveUp = false;
-                bool canMoveDown = false;
-
-                // Check if the block can move down
-                if (block[X] + 1 <= 5) // Not at the bottom edge
-                {
-                    if (State.IsMoveValid(block[X] + 1, block[Y]))
-                    {
-                        canMoveDown = true;
-                    }
-                    else
-                    {
-                        // Calculate cost for the downward blocker
-                        (int[] blockerBlock, string blockerName) = State.GetBlock(block[X] + 1, block[Y]);
-
-                        if (!visitedBlocks.Contains(blockerName))
-                        {
-                            visitedBlocks.Add(blockerName);
-                            this.Cost += 1; // Higher weight for blocks at lower depths
-                            ExamineBlockMobility(blockerBlock, blockerName, visitedBlocks, depth + 1);
-                        }
-                    }
-                }
-
-                // Check if the block can move up
-                if (block[X] - block[Span] >= 0) // Not at the top edge
-                {
-                    if (State.IsMoveValid(block[X] - block[Span], block[Y]))
-                    {
-                        canMoveUp = true;
-                    }
-                    else
-                    {
-                        // Calculate cost for the upward blocker
-                        (int[] blockerBlock, string blockerName) = State.GetBlock(block[X] - block[Span], block[Y]);
-
-                        if (!visitedBlocks.Contains(blockerName))
-                        {
-                            visitedBlocks.Add(blockerName);
-                            this.Cost += 1;
-                            ExamineBlockMobility(blockerBlock, blockerName, visitedBlocks, depth + 1);
-                        }
-                    }
-                }
-
-                // Adjust mobility score based on freedom of movement
-                if (canMoveUp || canMoveDown)
-                {
-                    mobilityScore = 0; // Good mobility
-                }
-                else
-                {
-                    mobilityScore = 1; // Poor mobility
-                }
-            }
-            else // Horizontal block
-            {
-                bool canMoveLeft = false;
-                bool canMoveRight = false;
-
-                // Check if the block can move left
-                if (block[Y] - 1 >= 0) // Not at the left edge
-                {
-                    if (State.IsMoveValid(block[X], block[Y] - 1))
-                    {
-                        canMoveLeft = true;
-                    }
-                    else
-                    {
-                        // Calculate cost for the leftward blocker
-                        (int[] blockerBlock, string blockerName) = State.GetBlock(block[X], block[Y] - 1);
-
-                        if (!visitedBlocks.Contains(blockerName))
-                        {
-                            visitedBlocks.Add(blockerName);
-                            this.Cost += 1;
-                            ExamineBlockMobility(blockerBlock, blockerName, visitedBlocks, depth + 1);
-                        }
-                    }
-                }
-
-                // Check if the block can move right
-                if (block[Y] + block[Span] <= 5) // Not at the right edge
-                {
-                    if (State.IsMoveValid(block[X], block[Y] + block[Span]))
-                    {
-                        canMoveRight = true;
-                    }
-                    else
-                    {
-                        // Calculate cost for the rightward blocker
-                        (int[] blockerBlock, string blockerName) = State.GetBlock(block[X], block[Y] + block[Span]);
-
-                        if (!visitedBlocks.Contains(blockerName))
-                        {
-                            visitedBlocks.Add(blockerName);
-                            this.Cost +=  1;
-                            ExamineBlockMobility(blockerBlock, blockerName, visitedBlocks, depth + 1);
-                        }
-                    }
-                }
-
-                // Adjust mobility score based on freedom of movement
-                if (canMoveLeft || canMoveRight)
-                {
-                    mobilityScore = 0; // Good mobility
-                }
-                else
-                {
-                    mobilityScore = 1; // Poor mobility
-                }
             }
 
-            // Add mobility score to total cost
-            this.Cost += mobilityScore;
+            int red = State.GetRed();
+            int h = Math.Max(0, 5 - red);
+            HashSet<string> visitedBlockers = new HashSet<string>();
+
+            for (int col = red + 1; col <= 5; col++)
+            {
+                if (!State.IsMoveValid(2, col))
+                {
+                    (int[] blockData, string blockName) = State.GetBlock(2, col);
+                    if (visitedBlockers.Add(blockName))
+                    {
+                        h += 1;
+
+                        if (blockData[IsHorizontal] == 0) // vertical blocker
+                        {
+                            int maxRow = blockData[X];
+                            int span = blockData[Span];
+                            int c = blockData[Y];
+
+                            bool canMoveUp = (maxRow - span >= 0) && State.IsMoveValid(maxRow - span, c);
+                            bool canMoveDown = (maxRow + 1 <= 5) && State.IsMoveValid(maxRow + 1, c);
+
+                            if (!canMoveUp && !canMoveDown)
+                            {
+                                h += 1; // Double blocked obstacle
+                            }
+                        }
+                    }
+                }
+            }
+            this.Cost = h;
         }
-
-
-
 
         public void initializeState(BoardModel state)
         {
             this.State = state;
+            this._stateKey = null;
+            this._hasHash = false;
         }
+
         public void initializePrevious(GameState prev)
         {
             this.Previous = prev;
         }
 
-        // will need to change it and make the name id's!!!!!!!! IMPORTANT
         public List<GameState> GetSuccessorStates()
         {
             GameState gameState = this;
-            // gets a list of tuples with (blockData, blockName)
             List<(int[], string)> recs = gameState.State.GetAllBlocks();
+            List<GameState> successors = new List<GameState>();
 
-            List<GameState> Seccessors = new List<GameState>();
             foreach ((int[] rec, string blockName) in recs)
             {
-                if (rec[IsHorizontal] == 0) // NotHorizontal
+                if (rec[IsHorizontal] == 0) // Vertical block
                 {
-                    if (gameState.State.IsMoveValid(rec[X] + 1, rec[Y]) && rec[X] + 1 <= 5) // Can go down?
+                    // Can go down?
+                    if (rec[X] + 1 <= 5 && gameState.State.IsMoveValid(rec[X] + 1, rec[Y]))
                     {
                         GameState newState = new GameState();
-                        newState.State = new BoardModel();
-                        foreach (var position in gameState.State.occupiedPositions)
-                        {
-                            newState.State.occupiedPositions.Add(position.Key, position.Value);
-                        }
-                        newState.State.AddBlock(rec[X] + 1, rec[Y], blockName); // Use the real name!
+                        newState.State = gameState.State.Clone();
+                        newState.State.AddBlock(rec[X] + 1, rec[Y], blockName);
                         newState.State.RemoveBlock(rec[X] - rec[Span] + 1, rec[Y]);
                         newState.CalculateCost();
                         newState.Previous = gameState;
-                        Seccessors.Add(newState);
+                        successors.Add(newState);
                     }
-                    if (gameState.State.IsMoveValid(rec[X] - rec[Span], rec[Y]) && rec[X] - rec[Span] >= 0) // Can go up?
+                    // Can go up?
+                    if (rec[X] - rec[Span] >= 0 && gameState.State.IsMoveValid(rec[X] - rec[Span], rec[Y]))
                     {
                         GameState newState = new GameState();
-                        newState.State = new BoardModel();
-                        foreach (var position in gameState.State.occupiedPositions)
-                        {
-                            newState.State.occupiedPositions.Add(position.Key, position.Value);
-                        }
-                        newState.State.AddBlock(rec[X] - rec[Span], rec[Y], blockName); // Use the real name!
+                        newState.State = gameState.State.Clone();
+                        newState.State.AddBlock(rec[X] - rec[Span], rec[Y], blockName);
                         newState.State.RemoveBlock(rec[X], rec[Y]);
                         newState.CalculateCost();
                         newState.Previous = gameState;
-                        Seccessors.Add(newState);
+                        successors.Add(newState);
                     }
                 }
-                else
+                else // Horizontal block
                 {
-                    if (gameState.State.IsMoveValid(rec[X], rec[Y] + 1) && rec[Y] + 1 <= 5) // can go right?
+                    // Can go right?
+                    if (rec[Y] + 1 <= 5 && gameState.State.IsMoveValid(rec[X], rec[Y] + 1))
                     {
                         GameState newState = new GameState();
-                        newState.State = new BoardModel();
-                        foreach (var position in gameState.State.occupiedPositions)
-                        {
-                            newState.State.occupiedPositions.Add(position.Key, position.Value);
-                        }
-                        newState.State.AddBlock(rec[X], rec[Y] + 1, blockName); // Use the real name!
+                        newState.State = gameState.State.Clone();
+                        newState.State.AddBlock(rec[X], rec[Y] + 1, blockName);
                         newState.State.RemoveBlock(rec[X], rec[Y] - rec[Span] + 1);
                         newState.CalculateCost();
                         newState.Previous = gameState;
-                        Seccessors.Add(newState);
+                        successors.Add(newState);
                     }
-                    if (gameState.State.IsMoveValid(rec[X], rec[Y] - rec[Span]) && rec[Y] - rec[Span] >= 0) // can go left?
+                    // Can go left?
+                    if (rec[Y] - rec[Span] >= 0 && gameState.State.IsMoveValid(rec[X], rec[Y] - rec[Span]))
                     {
                         GameState newState = new GameState();
-                        newState.State = new BoardModel();
-                        foreach (var position in gameState.State.occupiedPositions)
-                        {
-                            newState.State.occupiedPositions.Add(position.Key, position.Value);
-                        }
-                        newState.State.AddBlock(rec[X], rec[Y] - rec[Span], blockName); // Use the real name!
+                        newState.State = gameState.State.Clone();
+                        newState.State.AddBlock(rec[X], rec[Y] - rec[Span], blockName);
                         newState.State.RemoveBlock(rec[X], rec[Y]);
                         newState.CalculateCost();
                         newState.Previous = gameState;
-                        Seccessors.Add(newState);
+                        successors.Add(newState);
                     }
                 }
             }
-            return Seccessors;
+            return successors;
         }
+
         public List<GameState> ShowPath()
         {
             GameState gameState = this;

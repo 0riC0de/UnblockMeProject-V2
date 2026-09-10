@@ -1,11 +1,11 @@
-﻿using System;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Windows.Input;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Shapes;
 
 namespace UnblockMeProject
@@ -46,21 +46,26 @@ namespace UnblockMeProject
         public bool IsMoveValidRec(int row, int col, int span, bool isHorizontal)
         {
             if (isHorizontal)
+            {
                 for (int i = col; i > col - span; i--)
                 {
                     string key = $"{row},{i}";
                     if (occupiedPositions.ContainsKey(key))
                         return false;
                 }
+            }
             else
+            {
                 for (int i = row; i < row + span; i++)
                 {
                     string key = $"{i},{col}";
                     if (occupiedPositions.ContainsKey(key))
                         return false;
                 }
+            }
             return true;
         }
+
         public void PrintOccupiedPos()
         {
             foreach (var position in occupiedPositions)
@@ -68,6 +73,7 @@ namespace UnblockMeProject
                 Console.WriteLine($"Position: {position.Key}, Color: {position.Value}");
             }
         }
+
         public int GetRed()
         {
             int max = -1;
@@ -84,110 +90,131 @@ namespace UnblockMeProject
             }
             return max;
         }
-        public (int[],string) GetBlock(int row, int col)
+
+        public (int[], string) GetBlock(int row, int col)
         {
-            int span = 0;
-            int xCount = 0;
-            int yCount = 0;
-            int[] x = new int[4];
-            int[] y = new int[4];
-            string name = "";
-            foreach (var position in occupiedPositions)
+            string targetKey = $"{row},{col}";
+            if (!occupiedPositions.TryGetValue(targetKey, out string name) || string.IsNullOrEmpty(name))
             {
-                string key = row + "," + col;
-                if (position.Key == key)
-                {
-                    name = position.Value;
-                    break;
-                }
+                return (new int[4], "");
             }
+
+            int span = 0;
+            int maxRow = -1;
+            int maxCol = -1;
+            int minRow = 6;
+            int minCol = 6;
+
             foreach (var position in occupiedPositions)
             {
                 if (position.Value == name)
                 {
                     span++;
-                    string[] numbers = position.Key.Split(',');
-                    int rowNumber = int.Parse(numbers[0]);
-                    int colNumber = int.Parse(numbers[1]);
-                    x[xCount++] = colNumber;
-                    y[yCount++] = rowNumber;
-
+                    int comma = position.Key.IndexOf(',');
+                    int r = position.Key[0] - '0';
+                    int c = position.Key[comma + 1] - '0';
+                    if (r > maxRow) maxRow = r;
+                    if (r < minRow) minRow = r;
+                    if (c > maxCol) maxCol = c;
+                    if (c < minCol) minCol = c;
                 }
             }
+
             int[] Return = new int[4];
-            if (y[0] == y[1]) // not horizontal!
-            {
-                Return[3] = 1;
-                Return[1] = x.Max();
-                Return[0] = y.Max();
-                Return[2] = span;
-            }
-            else
-            {
-                Return[3] = 0;
-                Return[1] = x.Max();
-                Return[0] = y.Max();
-                Return[2] = span;
-            }
-            return (Return , name);
+            bool isHoriz = (minRow == maxRow);
+            Return[0] = maxRow;
+            Return[1] = maxCol;
+            Return[2] = span;
+            Return[3] = isHoriz ? 1 : 0;
+
+            return (Return, name);
         }
-        // method that will return a list of all of the rectangles on the board using the getblock format
-        public List<(int[] , string)> GetAllBlocks()
+
+        public Dictionary<string, char> blockCharMap = new Dictionary<string, char>();
+
+        public BoardModel Clone()
         {
-            List<(int[] , string)> blocks = new List<(int[] , string)>();
-            HashSet<string> visited = new HashSet<string>();
+            BoardModel clone = new BoardModel();
+            clone.occupiedPositions = new Dictionary<string, string>(this.occupiedPositions);
+            clone.blockCharMap = this.blockCharMap;
+            return clone;
+        }
+
+        public string GetStateKey()
+        {
+            char[] g = new char[36];
+            for (int i = 0; i < 36; i++) g[i] = '.';
+            foreach (var kvp in occupiedPositions)
+            {
+                int comma = kvp.Key.IndexOf(',');
+                int r = kvp.Key[0] - '0';
+                int c = kvp.Key[comma + 1] - '0';
+                int idx = r * 6 + c;
+                if (idx >= 0 && idx < 36)
+                {
+                    if (kvp.Value.Contains("Red"))
+                    {
+                        g[idx] = 'R';
+                    }
+                    else
+                    {
+                        if (!blockCharMap.TryGetValue(kvp.Value, out char ch))
+                        {
+                            int count = blockCharMap.Count;
+                            if (count < 26)
+                                ch = (char)('a' + count);
+                            else
+                                ch = (char)('A' + (count - 26) + (count - 26 >= 17 ? 1 : 0)); // Skip 'R' if needed
+                            blockCharMap[kvp.Value] = ch;
+                        }
+                        g[idx] = ch;
+                    }
+                }
+            }
+            return new string(g);
+        }
+
+        // method that will return a list of all of the rectangles on the board using the getblock format
+        public List<(int[], string)> GetAllBlocks()
+        {
+            List<(int[], string)> blocks = new List<(int[], string)>();
+            HashSet<string> visitedNames = new HashSet<string>();
 
             foreach (var position in occupiedPositions)
             {
-                if (!visited.Contains(position.Key))
+                if (visitedNames.Add(position.Value))
                 {
-                    string[] coordinates = position.Key.Split(',');
-                    int row = int.Parse(coordinates[0]);
-                    int col = int.Parse(coordinates[1]);
+                    int comma = position.Key.IndexOf(',');
+                    int row = position.Key[0] - '0';
+                    int col = position.Key[comma + 1] - '0';
 
-                    (int[] blockData , string blockName) = GetBlock(row, col);
-                    blocks.Add((blockData , blockName));
-
-                    // Mark all parts of the block as visited
-                    for (int i = 0; i < blockData[2]; i++)
-                    {
-                        if (blockData[3] == 1) // Horizontal
-                        {
-                            visited.Add($"{row},{col + i}");
-                        }
-                        else // Vertical
-                        {
-                            visited.Add($"{row + i},{col}");
-                        }
-                    }
+                    (int[] blockData, string blockName) = GetBlock(row, col);
+                    blocks.Add((blockData, blockName));
                 }
             }
             return blocks;
         }
 
-        public void DrawBoard(Grid GameBoard , MainWindow window)
+        public void DrawBoard(Grid GameBoard, MainWindow window)
         {
             RedBlock redBlock;
             RegularBlock regularBlock;
             GameBoard.Children.Clear();
-            List<(int[] , string)> blocks = new List<(int[], string)> ();
-            blocks = this.GetAllBlocks();
+            List<(int[], string)> blocks = this.GetAllBlocks();
             foreach (var block in blocks)
             {
-                if(block.Item2.Contains("Red"))
+                if (block.Item2.Contains("Red"))
                 {
-                    redBlock = new RedBlock(GameBoard,window, block.Item1[1] - block.Item1[2] + 1);
+                    redBlock = new RedBlock(GameBoard, window, block.Item1[1] - block.Item1[2] + 1);
                 }
                 else
                 {
-                    if (block.Item1[3] == 0)
+                    if (block.Item1[3] == 0) // Vertical
                         regularBlock = new RegularBlock(GameBoard, block.Item1[0] - block.Item1[2] + 1, block.Item1[1], block.Item1[2], 1, false, window, block.Item2);
-                   else
-                       regularBlock = new RegularBlock(GameBoard, block.Item1[0], block.Item1[1] - block.Item1[2] + 1,1, block.Item1[2], true, window, block.Item2);
-
+                    else // Horizontal
+                        regularBlock = new RegularBlock(GameBoard, block.Item1[0], block.Item1[1] - block.Item1[2] + 1, 1, block.Item1[2], true, window, block.Item2);
                 }
             }
-
         }
     }
 }
